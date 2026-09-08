@@ -14,6 +14,9 @@ import About from './pages/About';
 import Agents from './pages/Agents';
 import Contact from './pages/Contact';
 
+import AdminProjectList from './pages/admin/AdminProjectList';
+import AdminProjectForm from './pages/admin/AdminProjectForm';
+
 export default function App() {
   const [inquiryModalOpen, setInquiryModalOpen] = useState(false);
   const [modalPropertyTitle, setModalPropertyTitle] = useState('');
@@ -44,6 +47,11 @@ export default function App() {
               <Route path="/about" element={<About />} />
               <Route path="/agents" element={<Agents onOpenInquiryModal={handleOpenInquiryModal} />} />
               <Route path="/contact" element={<Contact />} />
+
+              {/* Admin Project Management Routes */}
+              <Route path="/admin/projects" element={<AdminProjectList />} />
+              <Route path="/admin/projects/add" element={<AdminProjectForm isEdit={false} />} />
+              <Route path="/admin/projects/edit/:id" element={<AdminProjectForm isEdit={true} />} />
             </Routes>
           </main>
 

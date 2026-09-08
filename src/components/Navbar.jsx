@@ -50,14 +50,14 @@ export default function Navbar({ onOpenInquiryModal }) {
           {/* Logo */}
           <Link to="/" className="group flex items-center gap-2">
             <div className="w-9 h-9 border border-[#C5A880] flex items-center justify-center rounded-sm transition-transform duration-500 group-hover:rotate-45">
-              <span className="text-[#C5A880] font-serif font-bold text-lg">A</span>
+              <span className="text-[#C5A880] font-serif font-bold text-lg">V V</span>
             </div>
             <div className="flex flex-col">
               <span className="font-serif text-xl font-bold tracking-[0.2em] text-white uppercase">
-                A U R A
+                VETRI VEL
               </span>
               <span className="text-[10px] tracking-[0.25em] text-[#C5A880] uppercase -mt-1 font-medium">
-                Luxury Realty
+                REAL ESTATE
               </span>
             </div>
           </Link>
@@ -106,7 +106,7 @@ export default function Navbar({ onOpenInquiryModal }) {
             {/* Schedule Consultation CTA */}
             <button
               onClick={() => onOpenInquiryModal ? onOpenInquiryModal() : navigate('/contact')}
-              className="px-5 py-2.5 bg-[#C5A880] hover:bg-[#b5966c] text-[#121417] text-xs uppercase tracking-widest font-semibold rounded-xs transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2 cursor-pointer"
+              className="px-5 py-2.5 bg-[#C5A880] hover:bg-[#b5966c] text-[#121417] text-xs uppercase tracking-widest font-bold rounded-xs transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2 cursor-pointer"
             >
               <span>Schedule Visit</span>
               <ChevronRight className="w-4 h-4" />
@@ -170,7 +170,7 @@ export default function Navbar({ onOpenInquiryModal }) {
                     setMobileMenuOpen(false);
                     onOpenInquiryModal ? onOpenInquiryModal() : navigate('/contact');
                   }}
-                  className="w-full py-3.5 bg-[#C5A880] text-[#121417] text-sm uppercase tracking-widest font-semibold rounded-xs shadow-lg flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full py-3.5 bg-[#C5A880] text-[#121417] text-sm uppercase tracking-widest font-bold rounded-xs shadow-lg flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <PhoneCall className="w-4 h-4" />
                   <span>Schedule Consultation</span>

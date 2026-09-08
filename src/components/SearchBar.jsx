@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, MapPin, Home, DollarSign, Bed, SlidersHorizontal } from 'lucide-react';
+import { Search, MapPin, Home, DollarSign, Bed } from 'lucide-react';
 import { LOCATIONS, PROPERTY_TYPES } from '../data/properties';
 
 export default function SearchBar({ onSearch, initialValues = {} }) {
@@ -10,17 +10,34 @@ export default function SearchBar({ onSearch, initialValues = {} }) {
   const [priceRange, setPriceRange] = useState(initialValues.priceRange || 'all');
   const [bedrooms, setBedrooms] = useState(initialValues.bedrooms || 'all');
 
+  useEffect(() => {
+    if (initialValues.location !== undefined) setLocation(initialValues.location);
+    if (initialValues.propertyType !== undefined) setPropertyType(initialValues.propertyType);
+    if (initialValues.priceRange !== undefined) setPriceRange(initialValues.priceRange);
+    if (initialValues.bedrooms !== undefined) setBedrooms(initialValues.bedrooms);
+  }, [initialValues.location, initialValues.propertyType, initialValues.priceRange, initialValues.bedrooms]);
+
+  const handleFilterChange = (newLoc, newType, newPrice, newBeds) => {
+    const loc = newLoc !== undefined ? newLoc : location;
+    const type = newType !== undefined ? newType : propertyType;
+    const price = newPrice !== undefined ? newPrice : priceRange;
+    const beds = newBeds !== undefined ? newBeds : bedrooms;
+
+    if (onSearch) {
+      onSearch({ location: loc, propertyType: type, priceRange: price, bedrooms: beds });
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    const queryParams = new URLSearchParams();
-    if (location && location !== 'All Locations') queryParams.set('location', location);
-    if (propertyType && propertyType !== 'All Types') queryParams.set('type', propertyType);
-    if (priceRange && priceRange !== 'all') queryParams.set('price', priceRange);
-    if (bedrooms && bedrooms !== 'all') queryParams.set('bedrooms', bedrooms);
-
     if (onSearch) {
       onSearch({ location, propertyType, priceRange, bedrooms });
     } else {
+      const queryParams = new URLSearchParams();
+      if (location && location !== 'All Locations') queryParams.set('location', location);
+      if (propertyType && propertyType !== 'All Types') queryParams.set('type', propertyType);
+      if (priceRange && priceRange !== 'all') queryParams.set('price', priceRange);
+      if (bedrooms && bedrooms !== 'all') queryParams.set('bedrooms', bedrooms);
       navigate(`/properties?${queryParams.toString()}`);
     }
   };
@@ -28,7 +45,7 @@ export default function SearchBar({ onSearch, initialValues = {} }) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-[#121417]/85 backdrop-blur-xl border border-white/15 p-4 sm:p-6 rounded-xs shadow-2xl w-full max-w-5xl mx-auto text-white"
+      className="bg-[#121417] backdrop-blur-xl border border-white/15 p-4 sm:p-6 rounded-xs shadow-2xl w-full max-w-7xl mx-auto text-white"
     >
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         
@@ -40,7 +57,11 @@ export default function SearchBar({ onSearch, initialValues = {} }) {
           </label>
           <select
             value={location}
-            onChange={(e) => setLocation(e.target.value)}
+            onChange={(e) => {
+              const val = e.target.value;
+              setLocation(val);
+              handleFilterChange(val, undefined, undefined, undefined);
+            }}
             className="w-full bg-white/5 border border-white/15 rounded-xs px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-[#C5A880] transition-colors cursor-pointer appearance-none"
           >
             {LOCATIONS.map((loc) => (
@@ -59,7 +80,11 @@ export default function SearchBar({ onSearch, initialValues = {} }) {
           </label>
           <select
             value={propertyType}
-            onChange={(e) => setPropertyType(e.target.value)}
+            onChange={(e) => {
+              const val = e.target.value;
+              setPropertyType(val);
+              handleFilterChange(undefined, val, undefined, undefined);
+            }}
             className="w-full bg-white/5 border border-white/15 rounded-xs px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-[#C5A880] transition-colors cursor-pointer appearance-none"
           >
             {PROPERTY_TYPES.map((type) => (
@@ -70,7 +95,7 @@ export default function SearchBar({ onSearch, initialValues = {} }) {
           </select>
         </div>
 
-        {/* Price Range Dropdown */}
+        {/* Price Bracket Dropdown */}
         <div className="flex flex-col space-y-1.5">
           <label className="text-[11px] uppercase tracking-widest text-[#C5A880] font-semibold flex items-center gap-1.5">
             <DollarSign className="w-3.5 h-3.5" />
@@ -78,7 +103,11 @@ export default function SearchBar({ onSearch, initialValues = {} }) {
           </label>
           <select
             value={priceRange}
-            onChange={(e) => setPriceRange(e.target.value)}
+            onChange={(e) => {
+              const val = e.target.value;
+              setPriceRange(val);
+              handleFilterChange(undefined, undefined, val, undefined);
+            }}
             className="w-full bg-white/5 border border-white/15 rounded-xs px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-[#C5A880] transition-colors cursor-pointer appearance-none"
           >
             <option value="all" className="bg-[#121417] text-white">All Price Ranges</option>
@@ -96,7 +125,11 @@ export default function SearchBar({ onSearch, initialValues = {} }) {
           </label>
           <select
             value={bedrooms}
-            onChange={(e) => setBedrooms(e.target.value)}
+            onChange={(e) => {
+              const val = e.target.value;
+              setBedrooms(val);
+              handleFilterChange(undefined, undefined, undefined, val);
+            }}
             className="w-full bg-white/5 border border-white/15 rounded-xs px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-[#C5A880] transition-colors cursor-pointer appearance-none"
           >
             <option value="all" className="bg-[#121417] text-white">Any Bedrooms</option>
@@ -110,13 +143,13 @@ export default function SearchBar({ onSearch, initialValues = {} }) {
       </div>
 
       {/* Submit Button */}
-      <div className="mt-5 pt-4 border-t border-white/10 flex items-center justify-between">
-        <span className="text-xs text-zinc-400 hidden sm:inline-block">
+      <div className="mt-5 pt-4 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <span className="text-xs text-zinc-400">
           Discover exclusive off-market coastal & metropolitan residences
         </span>
         <button
           type="submit"
-          className="w-full sm:w-auto px-8 py-3 bg-[#C5A880] hover:bg-[#b5966c] text-[#121417] text-xs font-semibold tracking-widest uppercase rounded-xs transition-all duration-300 shadow-lg flex items-center justify-center gap-2 cursor-pointer"
+          className="w-full sm:w-auto px-8 py-3 bg-[#C5A880] hover:bg-[#b5966c] text-[#121417] text-xs font-bold tracking-widest uppercase rounded-xs transition-all duration-300 shadow-lg flex items-center justify-center gap-2 cursor-pointer"
         >
           <Search className="w-4 h-4" />
           <span>Explore Properties</span>

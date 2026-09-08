@@ -23,14 +23,14 @@ export default function Footer() {
           <div className="lg:col-span-2 flex flex-col space-y-6">
             <Link to="/" className="flex items-center gap-2">
               <div className="w-8 h-8 border border-[#C5A880] flex items-center justify-center rounded-sm">
-                <span className="text-[#C5A880] font-serif font-bold text-base">A</span>
+                <span className="text-[#C5A880] font-serif font-bold text-base">V V</span>
               </div>
               <div className="flex flex-col">
                 <span className="font-serif text-xl font-bold tracking-[0.2em] text-white uppercase">
-                  A U R A
+                  VETRI VEL
                 </span>
                 <span className="text-[9px] tracking-[0.25em] text-[#C5A880] uppercase -mt-1 font-medium">
-                  Luxury Realty
+                  REAL ESTATE
                 </span>
               </div>
             </Link>

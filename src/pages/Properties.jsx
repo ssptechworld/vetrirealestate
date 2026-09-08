@@ -1,51 +1,93 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { SlidersHorizontal, Grid, LayoutList, Heart, Sparkles } from 'lucide-react';
+import { SlidersHorizontal, Heart } from 'lucide-react';
+import SearchBar from '../components/SearchBar';
 import PropertyFilters from '../components/PropertyFilters';
 import PropertyGrid from '../components/PropertyGrid';
-import { PROPERTIES_DATA } from '../data/properties';
 import { useFavorites } from '../context/FavoritesContext';
-import { fadeUp } from '../utils/animations';
+import { getProjects, formatProjectForCarousel } from '../services/projectService';
 
 export default function Properties() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { favorites } = useFavorites();
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
+  const [allProperties, setAllProperties] = useState([]);
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchDatabaseProjects = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const projects = await getProjects();
+        if (isMounted) {
+          const formatted = (projects || []).map(formatProjectForCarousel).filter(Boolean);
+          setAllProperties(formatted);
+        }
+      } catch (err) {
+        console.error("Failed to fetch database projects in Properties page:", err);
+        if (isMounted) {
+          setError("Failed to connect to property database. Please verify the backend API server is running.");
+          setAllProperties([]);
+        }
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+    fetchDatabaseProjects();
+    return () => { isMounted = false; };
+  }, []);
 
   // Filters State
   const [filters, setFilters] = useState({
     search: searchParams.get('search') || '',
     location: searchParams.get('location') || 'All Locations',
     type: searchParams.get('type') || 'All Types',
+    priceRange: searchParams.get('price') || 'all',
     maxPrice: 300000000,
     bedrooms: searchParams.get('bedrooms') || 'all',
     sortBy: 'featured',
     showFavoritesOnly: searchParams.get('favorites') === 'true'
   });
 
-  // Sync query params when filters change
+  // Sync query params when filters change from URL
   useEffect(() => {
     const isFav = searchParams.get('favorites') === 'true';
     const locParam = searchParams.get('location');
     const typeParam = searchParams.get('type');
+    const priceParam = searchParams.get('price');
+    const bedsParam = searchParams.get('bedrooms');
 
-    if (isFav !== filters.showFavoritesOnly || (locParam && locParam !== filters.location) || (typeParam && typeParam !== filters.type)) {
-      setFilters((prev) => ({
-        ...prev,
-        showFavoritesOnly: isFav,
-        location: locParam || prev.location,
-        type: typeParam || prev.type
-      }));
-    }
+    setFilters((prev) => ({
+      ...prev,
+      showFavoritesOnly: isFav,
+      location: locParam || 'All Locations',
+      type: typeParam || 'All Types',
+      priceRange: priceParam || 'all',
+      bedrooms: bedsParam || 'all'
+    }));
   }, [searchParams]);
 
   const handleFilterChange = (key, value) => {
     setLoading(true);
     setFilters((prev) => ({ ...prev, [key]: value }));
-    setTimeout(() => setLoading(false), 300);
+    setTimeout(() => setLoading(false), 200);
+  };
+
+  const handleSearchFromBar = ({ location, propertyType, priceRange, bedrooms }) => {
+    setLoading(true);
+    setFilters((prev) => ({
+      ...prev,
+      location: location || 'All Locations',
+      type: propertyType || 'All Types',
+      priceRange: priceRange || 'all',
+      bedrooms: bedrooms || 'all'
+    }));
+    setTimeout(() => setLoading(false), 200);
   };
 
   const handleReset = () => {
@@ -54,18 +96,19 @@ export default function Properties() {
       search: '',
       location: 'All Locations',
       type: 'All Types',
+      priceRange: 'all',
       maxPrice: 300000000,
       bedrooms: 'all',
       sortBy: 'featured',
       showFavoritesOnly: false
     });
     setSearchParams({});
-    setTimeout(() => setLoading(false), 300);
+    setTimeout(() => setLoading(false), 200);
   };
 
   // Filtered Properties Computation
   const filteredProperties = useMemo(() => {
-    let result = [...PROPERTIES_DATA];
+    let result = [...allProperties];
 
     if (filters.showFavoritesOnly) {
       result = result.filter((p) => favorites.includes(p.id));
@@ -75,26 +118,49 @@ export default function Properties() {
       const q = filters.search.toLowerCase();
       result = result.filter(
         (p) =>
-          p.title.toLowerCase().includes(q) ||
-          p.location.toLowerCase().includes(q) ||
-          p.propertyType.toLowerCase().includes(q) ||
-          p.description.toLowerCase().includes(q)
+          (p.title && p.title.toLowerCase().includes(q)) ||
+          (p.name && p.name.toLowerCase().includes(q)) ||
+          (p.location && p.location.toLowerCase().includes(q)) ||
+          (p.propertyType && p.propertyType.toLowerCase().includes(q)) ||
+          (p.description && p.description.toLowerCase().includes(q))
       );
     }
 
-    if (filters.location !== 'All Locations') {
-      result = result.filter((p) => p.areaName === filters.location || p.location.includes(filters.location));
+    if (filters.location && filters.location !== 'All Locations') {
+      const locQ = filters.location.toLowerCase();
+      result = result.filter(
+        (p) =>
+          (p.areaName && p.areaName.toLowerCase().includes(locQ)) ||
+          (p.location && p.location.toLowerCase().includes(locQ))
+      );
     }
 
-    if (filters.type !== 'All Types') {
-      result = result.filter((p) => p.propertyType === filters.type);
+    if (filters.type && filters.type !== 'All Types') {
+      const typeQ = filters.type.toLowerCase();
+      result = result.filter(
+        (p) => p.propertyType && p.propertyType.toLowerCase().includes(typeQ)
+      );
     }
 
-    result = result.filter((p) => p.price <= filters.maxPrice);
+    // Price Bracket Filtering
+    if (filters.priceRange === 'under-10cr') {
+      result = result.filter((p) => p.price < 100000000);
+    } else if (filters.priceRange === '10cr-20cr') {
+      result = result.filter((p) => p.price >= 100000000 && p.price <= 200000000);
+    } else if (filters.priceRange === 'above-20cr') {
+      result = result.filter((p) => p.price > 200000000);
+    } else {
+      if (filters.maxPrice < 300000000) {
+        result = result.filter((p) => p.price <= filters.maxPrice || p.price === 0);
+      }
+    }
 
     if (filters.bedrooms !== 'all') {
       const minBeds = parseInt(filters.bedrooms, 10);
-      result = result.filter((p) => p.bedrooms >= minBeds);
+      result = result.filter((p) => {
+        const bedVal = parseInt(String(p.bedrooms).replace(/[^0-9]/g, ''), 10);
+        return isNaN(bedVal) ? true : bedVal >= minBeds;
+      });
     }
 
     // Sort logic
@@ -105,30 +171,44 @@ export default function Properties() {
     } else if (filters.sortBy === 'sqft-desc') {
       result.sort((a, b) => b.sqft - a.sqft);
     } else {
-      // featured
-      result.sort((a, b) => (b.isFeatured ? 1 : 0) - (a.isFeatured ? 1 : 0));
+      result.sort((a, b) => (b.badge === 'Featured' ? 1 : 0) - (a.badge === 'Featured' ? 1 : 0));
     }
 
     return result;
-  }, [filters, favorites]);
+  }, [filters, favorites, allProperties]);
 
   return (
     <div className="min-h-screen bg-[#FAF8F5] pt-28 pb-20">
       
-      {/* Banner Header */}
+      {/* Banner Header with Integrated Search & Filter UI */}
       <section className="bg-[#121417] text-white py-16 mb-12 border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <span className="text-xs uppercase tracking-widest text-[#C5A880] font-semibold block mb-2">
-            Architectural Sanctuaries
-          </span>
-          <h1 className="font-serif text-4xl sm:text-5xl font-bold tracking-tight">
-            {filters.showFavoritesOnly ? 'Your Saved Favorites' : 'Exclusive Property Discovery'}
-          </h1>
-          <p className="text-zinc-400 text-sm max-w-xl mx-auto mt-3 font-light">
-            {filters.showFavoritesOnly
-              ? `Reviewing your saved ${favorites.length} shortlisted luxury residences.`
-              : 'Browse luxury beachfront villas, high-rise penthouses, and heritage private estates.'}
-          </p>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
+          <div>
+            <span className="text-xs uppercase tracking-widest text-[#C5A880] font-bold block mb-2">
+              Architectural Sanctuaries
+            </span>
+            <h1 className="font-serif text-4xl sm:text-5xl font-bold tracking-tight">
+              {filters.showFavoritesOnly ? 'Your Saved Favorites' : 'Exclusive Property Discovery'}
+            </h1>
+            <p className="text-zinc-400 text-sm max-w-xl mx-auto mt-3 font-light">
+              {filters.showFavoritesOnly
+                ? `Reviewing your saved ${favorites.length} shortlisted luxury residences.`
+                : 'Browse luxury beachfront villas, high-rise penthouses, and heritage private estates.'}
+            </p>
+          </div>
+
+          {/* Property Search / Filter Bar Component */}
+          <div className="pt-2">
+            <SearchBar
+              onSearch={handleSearchFromBar}
+              initialValues={{
+                location: filters.location,
+                propertyType: filters.type,
+                priceRange: filters.priceRange,
+                bedrooms: filters.bedrooms
+              }}
+            />
+          </div>
         </div>
       </section>
 
@@ -153,10 +233,10 @@ export default function Properties() {
             {/* Mobile Filter Drawer Trigger */}
             <button
               onClick={() => setMobileFilterOpen(true)}
-              className="lg:hidden flex-1 sm:flex-none px-4 py-2.5 bg-[#121417] text-white text-xs uppercase tracking-wider font-semibold rounded-xs flex items-center justify-center gap-2"
+              className="lg:hidden flex-1 sm:flex-none px-4 py-2.5 bg-[#121417] text-white text-xs uppercase tracking-wider font-bold rounded-xs flex items-center justify-center gap-2"
             >
               <SlidersHorizontal className="w-4 h-4 text-[#C5A880]" />
-              <span>Filters ({filteredProperties.length})</span>
+              <span>More Filters ({filteredProperties.length})</span>
             </button>
           </div>
         </div>
@@ -181,6 +261,7 @@ export default function Properties() {
             <PropertyGrid
               properties={filteredProperties}
               loading={loading}
+              error={error}
               onResetFilters={handleReset}
             />
           </div>

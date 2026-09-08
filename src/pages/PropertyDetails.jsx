@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { MapPin, Heart, Share2, Calendar, Phone, MessageSquare, ArrowLeft, CheckCircle2, ShieldCheck, ChevronRight } from 'lucide-react';
@@ -10,6 +10,7 @@ import { PROPERTIES_DATA } from '../data/properties';
 import { AGENTS_DATA } from '../data/agents';
 import { useFavorites } from '../context/FavoritesContext';
 import { fadeUp } from '../utils/animations';
+import { getProjectById, formatProjectForCarousel } from '../services/projectService';
 
 export default function PropertyDetails({ onOpenInquiryModal }) {
   const { id } = useParams();
@@ -18,8 +19,55 @@ export default function PropertyDetails({ onOpenInquiryModal }) {
 
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
+  const [property, setProperty] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const property = PROPERTIES_DATA.find((p) => p.id === id) || PROPERTIES_DATA[0];
+  useEffect(() => {
+    let isMounted = true;
+    const fetchPropertyDetails = async () => {
+      setLoading(true);
+      // 1. Search in static data
+      const staticProp = PROPERTIES_DATA.find((p) => p.id === id);
+      if (staticProp) {
+        if (isMounted) {
+          setProperty(staticProp);
+          setLoading(false);
+        }
+        return;
+      }
+
+      // 2. Fetch from MongoDB API
+      try {
+        const apiProj = await getProjectById(id);
+        if (isMounted && apiProj) {
+          const formatted = formatProjectForCarousel(apiProj);
+          setProperty(formatted);
+        }
+      } catch (err) {
+        console.error('Error fetching project from API:', err);
+        if (isMounted) {
+          setProperty(PROPERTIES_DATA[0]);
+        }
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+
+    fetchPropertyDetails();
+    return () => { isMounted = false; };
+  }, [id]);
+
+  if (loading || !property) {
+    return (
+      <div className="min-h-screen bg-[#FAF8F5] pt-32 pb-24 flex justify-center items-center">
+        <div className="flex items-center gap-3 text-[#C5A880]">
+          <div className="w-6 h-6 border-2 border-[#C5A880] border-t-transparent rounded-full animate-spin" />
+          <span className="uppercase tracking-widest font-semibold text-xs text-zinc-600">Loading Property Details...</span>
+        </div>
+      </div>
+    );
+  }
+
   const agent = AGENTS_DATA.find((a) => a.id === property.agentId) || AGENTS_DATA[0];
   const favorite = isFavorite(property.id);
 
@@ -85,7 +133,7 @@ export default function PropertyDetails({ onOpenInquiryModal }) {
         
         {/* 1. PROPERTY GALLERY SHOWCASE */}
         <div className="mb-10">
-          <PropertyGallery gallery={property.gallery} title={property.title} />
+          <PropertyGallery gallery={property.gallery && property.gallery.length > 0 ? property.gallery : [property.heroImage]} title={property.title} />
         </div>
 
         {/* 2. TITLE & PRICE HEADER */}

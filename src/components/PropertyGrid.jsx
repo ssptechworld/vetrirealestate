@@ -4,7 +4,7 @@ import PropertyCard from './PropertyCard';
 import { staggerContainer } from '../utils/animations';
 import { SearchX, RefreshCw } from 'lucide-react';
 
-export default function PropertyGrid({ properties, loading, onResetFilters }) {
+export default function PropertyGrid({ properties, loading, error, onResetFilters }) {
   if (loading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -18,6 +18,22 @@ export default function PropertyGrid({ properties, loading, onResetFilters }) {
           </div>
         ))}
       </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-white border border-stone-200/80 rounded-xs p-12 text-center flex flex-col items-center justify-center space-y-4 my-8"
+      >
+        <div className="w-16 h-16 rounded-full bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-600">
+          <SearchX className="w-8 h-8" />
+        </div>
+        <h3 className="font-serif text-2xl font-bold text-[#121417]">Error Loading Database Properties</h3>
+        <p className="text-zinc-500 text-sm max-w-md">{error}</p>
+      </motion.div>
     );
   }
 
