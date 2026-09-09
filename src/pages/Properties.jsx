@@ -178,22 +178,23 @@ export default function Properties() {
   }, [filters, favorites, allProperties]);
 
   return (
-    <div className="min-h-screen bg-[#FAF8F5] pt-28 pb-20">
+    <div className="min-h-screen bg-[#FAF8F5] pt-24 pb-20">
       
       {/* Banner Header with Integrated Search & Filter UI */}
-      <section className="bg-[#121417] text-white py-16 mb-12 border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
+      <section className="bg-[#0E1013] text-white py-20 mb-12 border-b border-white/10 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-15 bg-[radial-gradient(circle_at_30%_30%,rgba(197,168,128,0.3),transparent_70%)] pointer-events-none" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6 relative z-10">
           <div>
-            <span className="text-xs uppercase tracking-widest text-[#C5A880] font-bold block mb-2">
-              Architectural Sanctuaries
+            <span className="text-xs uppercase tracking-[0.25em] text-[#C5A880] font-bold block mb-2">
+              COMPLETED & ONGOING PORTFOLIO
             </span>
-            <h1 className="font-serif text-4xl sm:text-5xl font-bold tracking-tight">
-              {filters.showFavoritesOnly ? 'Your Saved Favorites' : 'Exclusive Property Discovery'}
+            <h1 className="font-serif text-4xl sm:text-5xl font-bold tracking-tight uppercase">
+              {filters.showFavoritesOnly ? 'Your Saved Residences' : 'Explore Luxury Residences'}
             </h1>
-            <p className="text-zinc-400 text-sm max-w-xl mx-auto mt-3 font-light">
+            <p className="text-stone-300 text-sm max-w-xl mx-auto mt-3 font-light leading-relaxed">
               {filters.showFavoritesOnly
-                ? `Reviewing your saved ${favorites.length} shortlisted luxury residences.`
-                : 'Browse luxury beachfront villas, high-rise penthouses, and heritage private estates.'}
+                ? `Reviewing your ${favorites.length} saved shortlisted properties.`
+                : 'Browse completed ready-to-move apartments, oceanfront residences, and upcoming flagship developments.'}
             </p>
           </div>
 

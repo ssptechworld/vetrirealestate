@@ -33,22 +33,23 @@ export default function About() {
     <div className="min-h-screen bg-[#FAF8F5] pt-28 pb-24">
       
       {/* 1. HERO BANNER */}
-      <section className="bg-[#121417] text-white py-20 border-b border-white/10 relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-          <span className="text-xs uppercase tracking-widest text-[#C5A880] font-semibold block mb-3">
+      <section className="bg-[#0E1013] text-white pt-20 pb-24 border-b border-[#C5A880]/20 relative overflow-hidden rounded-b-[48px] sm:rounded-b-[80px] shadow-2xl">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#C5A880]/15 via-transparent to-transparent pointer-events-none" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10 space-y-4">
+          <span className="px-4 py-1.5 rounded-full bg-[#C5A880]/15 border border-[#C5A880]/30 text-[#C5A880] text-xs font-semibold uppercase tracking-widest inline-block">
             Our Legacy & Story
           </span>
-          <h1 className="font-serif text-4xl sm:text-6xl font-bold tracking-tight max-w-4xl mx-auto">
+          <h1 className="font-serif text-4xl sm:text-6xl font-bold tracking-tight max-w-4xl mx-auto text-white leading-tight">
             Architectural Excellence & Discrete Luxury
           </h1>
-          <p className="text-stone-300 text-sm sm:text-base max-w-2xl mx-auto mt-6 leading-relaxed font-light">
+          <p className="text-stone-300 text-sm sm:text-base max-w-2xl mx-auto mt-4 leading-relaxed font-light">
             Founded on the principles of architectural integrity, uncompromised privacy, and bespoke advisory for South India’s finest estates.
           </p>
         </div>
       </section>
 
       {/* 2. COMPANY INTRODUCTION & STORY */}
-      <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           
           <motion.div
@@ -59,14 +60,14 @@ export default function About() {
             className="space-y-6"
           >
             <span className="text-xs uppercase tracking-widest text-[#C5A880] font-semibold">
-              The AURA Philosophy
+              The Vetri Vel Philosophy
             </span>
-            <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#121417]">
+            <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#0E1013]">
               Crafting Sanctuaries for Generations to Come
             </h2>
             
-            <p className="text-zinc-700 text-sm leading-relaxed font-light">
-              Since 2008, AURA Luxury Realty has served as South India’s premier estate advisory firm. We believe that true luxury real estate transcends square footage—it lies in the harmony between natural oceanfront topography, architectural light, and timeless materials.
+            <p className="text-zinc-700 text-sm sm:text-base leading-relaxed font-light">
+              Since 2008, Vetri Vel Real Estate has served as South India’s premier construction & estate development brand. We believe that true real estate excellence lies in structural integrity, Vastu alignment, and timeless craftsmanship.
             </p>
 
             <p className="text-zinc-700 text-sm leading-relaxed font-light">
@@ -74,17 +75,17 @@ export default function About() {
             </p>
 
             {/* Mission & Vision grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4 border-t border-stone-200">
-              <div>
-                <h4 className="font-serif font-bold text-[#121417] text-base mb-1">Our Mission</h4>
-                <p className="text-xs text-zinc-500 leading-relaxed">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-6 border-t border-stone-200">
+              <div className="bg-white p-6 rounded-[24px] border border-stone-200/80 shadow-sm space-y-2">
+                <h4 className="font-serif font-bold text-[#0E1013] text-base">Our Mission</h4>
+                <p className="text-xs text-zinc-500 leading-relaxed font-light">
                   To seamlessly connect discerning buyers with trophy architectural assets through transparent, highly confidential advisory.
                 </p>
               </div>
 
-              <div>
-                <h4 className="font-serif font-bold text-[#121417] text-base mb-1">Our Vision</h4>
-                <p className="text-xs text-zinc-500 leading-relaxed">
+              <div className="bg-white p-6 rounded-[24px] border border-stone-200/80 shadow-sm space-y-2">
+                <h4 className="font-serif font-bold text-[#0E1013] text-base">Our Vision</h4>
+                <p className="text-xs text-zinc-500 leading-relaxed font-light">
                   To remain South India’s benchmark for luxury real estate curation, setting the standard in tropical modernist living.
                 </p>
               </div>
@@ -98,12 +99,17 @@ export default function About() {
             viewport={{ once: true, margin: "-50px" }}
             className="relative"
           >
-            <div className="aspect-[4/3] rounded-xs overflow-hidden border border-stone-300 shadow-2xl">
+            <div className="aspect-[4/5] sm:aspect-[4/3] rounded-t-[140px] sm:rounded-t-[220px] rounded-b-[36px] overflow-hidden border border-[#C5A880]/30 shadow-2xl relative group">
               <img
                 src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=85"
                 alt="Luxury Estate Architecture"
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0E1013]/60 via-transparent to-transparent" />
+              <div className="absolute bottom-6 left-6 right-6 p-4 rounded-2xl bg-[#0E1013]/80 backdrop-blur-md border border-[#C5A880]/30 text-white text-xs">
+                <span className="text-[#C5A880] font-semibold block uppercase tracking-widest text-[10px]">Architectural Blueprint</span>
+                Vetri Vel Estate Flagship Residence
+              </div>
             </div>
           </motion.div>
 
@@ -122,12 +128,12 @@ export default function About() {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-50px" }}
-            className="text-center max-w-2xl mx-auto mb-16"
+            className="text-center max-w-2xl mx-auto mb-16 space-y-3"
           >
-            <span className="text-xs uppercase tracking-widest text-[#C5A880] font-semibold block mb-2">
+            <span className="text-xs uppercase tracking-widest text-[#C5A880] font-semibold block">
               Our Core Pillars
             </span>
-            <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#121417]">
+            <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#0E1013]">
               Guided by Integrity & Mastery
             </h2>
           </motion.div>
@@ -145,13 +151,13 @@ export default function About() {
                 <motion.div
                   key={i}
                   variants={fadeUp}
-                  className="bg-white p-6 rounded-xs border border-stone-200/80 shadow-sm space-y-4 hover:shadow-lg transition-shadow"
+                  className="bg-white p-8 rounded-[32px] border border-stone-200/80 shadow-md space-y-5 hover:shadow-xl transition-all hover:-translate-y-1.5"
                 >
-                  <div className="w-12 h-12 rounded-xs bg-[#FAF8F5] border border-[#C5A880]/30 text-[#C5A880] flex items-center justify-center">
+                  <div className="w-14 h-14 rounded-full bg-[#0E1013] border border-[#C5A880]/40 text-[#C5A880] flex items-center justify-center shadow-md">
                     <Icon className="w-6 h-6" />
                   </div>
-                  <h3 className="font-serif text-lg font-bold text-[#121417]">{v.title}</h3>
-                  <p className="text-xs text-zinc-600 leading-relaxed">{v.description}</p>
+                  <h3 className="font-serif text-xl font-bold text-[#0E1013]">{v.title}</h3>
+                  <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed font-light">{v.description}</p>
                 </motion.div>
               );
             })}
@@ -161,7 +167,7 @@ export default function About() {
       </section>
 
       {/* 5. ANIMATED COMPANY MILESTONES TIMELINE */}
-      <section className="py-24 bg-[#121417] text-white">
+      <section className="py-24 bg-[#0E1013] text-white relative overflow-hidden rounded-t-[48px] sm:rounded-t-[80px] border-t border-[#C5A880]/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <motion.div
@@ -169,16 +175,16 @@ export default function About() {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-50px" }}
-            className="text-center max-w-2xl mx-auto mb-16"
+            className="text-center max-w-2xl mx-auto mb-16 space-y-3"
           >
-            <span className="text-xs uppercase tracking-widest text-[#C5A880] font-semibold block mb-2">
+            <span className="text-xs uppercase tracking-widest text-[#C5A880] font-semibold block">
               18+ Years Journey
             </span>
-            <h2 className="font-serif text-3xl sm:text-4xl font-bold">
+            <h2 className="font-serif text-3xl sm:text-4xl font-bold text-white">
               Our Journey of Milestones
             </h2>
-            <p className="text-zinc-400 text-sm mt-3 font-light">
-              Key moments that shaped AURA into South India's premier luxury estate advisory.
+            <p className="text-zinc-400 text-sm font-light">
+              Key moments that shaped Vetri Vel into South India's premier real estate & development brand.
             </p>
           </motion.div>
 
@@ -190,3 +196,4 @@ export default function About() {
     </div>
   );
 }
+

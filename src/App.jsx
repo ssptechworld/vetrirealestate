@@ -10,12 +10,13 @@ import Modal from './components/Modal';
 import Home from './pages/Home';
 import Properties from './pages/Properties';
 import PropertyDetails from './pages/PropertyDetails';
+import Gallery from './pages/Gallery';
 import About from './pages/About';
-import Agents from './pages/Agents';
 import Contact from './pages/Contact';
 
 import AdminProjectList from './pages/admin/AdminProjectList';
 import AdminProjectForm from './pages/admin/AdminProjectForm';
+import AdminGallery from './pages/admin/AdminGallery';
 
 export default function App() {
   const [inquiryModalOpen, setInquiryModalOpen] = useState(false);
@@ -44,14 +45,15 @@ export default function App() {
               <Route path="/" element={<Home onOpenInquiryModal={handleOpenInquiryModal} />} />
               <Route path="/properties" element={<Properties />} />
               <Route path="/properties/:id" element={<PropertyDetails onOpenInquiryModal={handleOpenInquiryModal} />} />
+              <Route path="/gallery" element={<Gallery />} />
               <Route path="/about" element={<About />} />
-              <Route path="/agents" element={<Agents onOpenInquiryModal={handleOpenInquiryModal} />} />
               <Route path="/contact" element={<Contact />} />
 
-              {/* Admin Project Management Routes */}
+              {/* Admin Routes */}
               <Route path="/admin/projects" element={<AdminProjectList />} />
               <Route path="/admin/projects/add" element={<AdminProjectForm isEdit={false} />} />
               <Route path="/admin/projects/edit/:id" element={<AdminProjectForm isEdit={true} />} />
+              <Route path="/admin/gallery" element={<AdminGallery />} />
             </Routes>
           </main>
 

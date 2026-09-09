@@ -82,7 +82,7 @@ export default function PropertyDetails({ onOpenInquiryModal }) {
   };
 
   const whatsappUrl = `https://wa.me/${agent.whatsapp}?text=${encodeURIComponent(
-    `Hello ${agent.name}, I am inquiring about "${property.title}" listed at ${property.formattedPrice} on AURA Realty.`
+    `Hello ${agent.name}, I am inquiring about "${property.title}" listed at ${property.formattedPrice} on Vetri Vel Real Estate.`
   )}`;
 
   return (
@@ -93,21 +93,21 @@ export default function PropertyDetails({ onOpenInquiryModal }) {
         <div className="flex items-center justify-between">
           <button
             onClick={() => navigate(-1)}
-            className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-zinc-500 hover:text-[#121417] transition-colors cursor-pointer"
+            className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-white/80 border border-stone-200 text-xs font-semibold uppercase tracking-wider text-zinc-600 hover:text-[#0E1013] hover:border-[#C5A880] transition-colors cursor-pointer shadow-sm"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="w-4 h-4 text-[#C5A880]" />
             <span>Back to Listings</span>
           </button>
 
           <div className="flex items-center space-x-3">
             <button
               onClick={handleShare}
-              className="p-2.5 bg-white border border-stone-200 rounded-full text-zinc-600 hover:text-[#121417] hover:border-[#C5A880] transition-colors cursor-pointer shadow-sm relative"
+              className="p-3 bg-white border border-stone-200 rounded-full text-zinc-600 hover:text-[#0E1013] hover:border-[#C5A880] transition-colors cursor-pointer shadow-sm relative"
               title="Share listing link"
             >
               <Share2 className="w-4 h-4" />
               {copied && (
-                <span className="absolute -bottom-8 right-0 bg-[#121417] text-white text-[10px] py-1 px-2.5 rounded shadow-lg whitespace-nowrap">
+                <span className="absolute -bottom-10 right-0 bg-[#0E1013] text-[#C5A880] text-[10px] py-1.5 px-3 rounded-full shadow-lg whitespace-nowrap border border-[#C5A880]/30 font-semibold uppercase tracking-widest">
                   Link Copied!
                 </span>
               )}
@@ -115,7 +115,7 @@ export default function PropertyDetails({ onOpenInquiryModal }) {
 
             <button
               onClick={() => toggleFavorite(property.id)}
-              className={`p-2.5 rounded-full border transition-colors cursor-pointer shadow-sm ${
+              className={`p-3 rounded-full border transition-colors cursor-pointer shadow-sm ${
                 favorite
                   ? 'bg-rose-500 text-white border-rose-500'
                   : 'bg-white text-zinc-600 border-stone-200 hover:text-rose-500'
@@ -137,35 +137,35 @@ export default function PropertyDetails({ onOpenInquiryModal }) {
         </div>
 
         {/* 2. TITLE & PRICE HEADER */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between border-b border-stone-200 pb-8 mb-10 gap-6">
-          <div className="space-y-3">
+        <div className="flex flex-col md:flex-row md:items-end justify-between bg-white p-8 sm:p-10 rounded-[36px] border border-stone-200/80 shadow-md mb-10 gap-6 relative overflow-hidden">
+          <div className="space-y-4">
             <div className="flex flex-wrap items-center gap-3">
-              <span className="px-3 py-1 bg-[#121417] text-[#C5A880] text-xs font-semibold uppercase tracking-wider rounded-xs">
+              <span className="px-4 py-1.5 bg-[#0E1013] text-[#C5A880] text-xs font-semibold uppercase tracking-widest rounded-full border border-[#C5A880]/30">
                 {property.propertyType}
               </span>
               {property.isExclusive && (
-                <span className="px-3 py-1 bg-[#C5A880]/20 text-[#8B6B3E] border border-[#C5A880]/40 text-xs font-semibold uppercase tracking-wider rounded-xs">
+                <span className="px-4 py-1.5 bg-[#C5A880]/15 text-[#8B6B3E] border border-[#C5A880]/40 text-xs font-semibold uppercase tracking-widest rounded-full">
                   Exclusive Listing
                 </span>
               )}
             </div>
 
-            <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-[#121417]">
+            <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-[#0E1013] tracking-tight">
               {property.title}
             </h1>
 
             <div className="flex items-center gap-2 text-zinc-500 text-sm">
               <MapPin className="w-4 h-4 text-[#C5A880]" />
-              <span>{property.location}</span>
+              <span className="font-medium">{property.location}</span>
             </div>
           </div>
 
           {/* Price Block */}
-          <div className="bg-white p-6 rounded-xs border border-stone-200/80 shadow-sm text-right md:text-right">
-            <span className="text-xs uppercase tracking-widest text-zinc-400 font-medium block mb-1">
+          <div className="bg-[#0E1013] p-6 rounded-[28px] border border-[#C5A880]/30 shadow-xl text-left md:text-right shrink-0">
+            <span className="text-[10px] uppercase tracking-widest text-[#C5A880] font-semibold block mb-1">
               Guide Listing Price
             </span>
-            <span className="font-serif text-3xl sm:text-4xl font-bold text-[#121417]">
+            <span className="font-serif text-3xl sm:text-4xl font-bold text-white">
               {property.formattedPrice}
             </span>
           </div>
@@ -181,21 +181,21 @@ export default function PropertyDetails({ onOpenInquiryModal }) {
             <PropertySpecs property={property} />
 
             {/* Overview & Description */}
-            <div className="bg-white p-6 sm:p-8 rounded-xs border border-stone-200/80 shadow-sm space-y-4">
-              <h3 className="font-serif text-2xl font-bold text-[#121417] border-b border-stone-200 pb-3">
+            <div className="bg-white p-8 sm:p-10 rounded-[36px] border border-stone-200/80 shadow-md space-y-5">
+              <h3 className="font-serif text-2xl font-bold text-[#0E1013] border-b border-stone-100 pb-4">
                 Architectural Overview
               </h3>
-              <p className="text-zinc-700 text-sm leading-relaxed whitespace-pre-line font-light">
+              <p className="text-zinc-700 text-sm sm:text-base leading-relaxed whitespace-pre-line font-light">
                 {property.description}
               </p>
 
               {/* Highlights Bullet List */}
               {property.highlights && (
-                <div className="pt-6 border-t border-stone-100 space-y-3">
-                  <h4 className="font-serif font-bold text-[#121417] text-base">Key Residence Highlights</h4>
-                  <ul className="space-y-2 text-xs text-zinc-600">
+                <div className="pt-6 border-t border-stone-100 space-y-4">
+                  <h4 className="font-serif font-bold text-[#0E1013] text-base">Key Residence Highlights</h4>
+                  <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm text-zinc-600">
                     {property.highlights.map((h, i) => (
-                      <li key={i} className="flex items-start gap-2">
+                      <li key={i} className="flex items-start gap-2.5 bg-[#FAF8F5] p-3 rounded-2xl border border-stone-100">
                         <CheckCircle2 className="w-4 h-4 text-[#C5A880] shrink-0 mt-0.5" />
                         <span>{h}</span>
                       </li>
@@ -209,8 +209,8 @@ export default function PropertyDetails({ onOpenInquiryModal }) {
             <AmenitiesList amenities={property.amenities} />
 
             {/* Assigned Advisor Section */}
-            <div className="bg-[#121417] text-white p-6 sm:p-8 rounded-xs shadow-xl space-y-6">
-              <div className="flex items-center gap-2 text-[#C5A880]">
+            <div className="bg-[#0E1013] text-white p-8 sm:p-10 rounded-[36px] border border-[#C5A880]/30 shadow-2xl space-y-8 relative overflow-hidden">
+              <div className="flex items-center gap-2.5 text-[#C5A880]">
                 <ShieldCheck className="w-5 h-5" />
                 <span className="text-xs uppercase tracking-widest font-semibold">Assigned Private Advisory Partner</span>
               </div>
@@ -219,21 +219,21 @@ export default function PropertyDetails({ onOpenInquiryModal }) {
                 <img
                   src={agent.image}
                   alt={agent.name}
-                  className="w-24 h-24 rounded-full object-cover border-2 border-[#C5A880]"
+                  className="w-24 h-24 rounded-full object-cover border-2 border-[#C5A880] shadow-xl"
                 />
-                <div className="space-y-1 text-center sm:text-left">
-                  <h4 className="font-serif text-xl font-bold text-white">{agent.name}</h4>
-                  <p className="text-xs text-[#C5A880]">{agent.title}</p>
-                  <p className="text-xs text-zinc-400 max-w-md pt-1">{agent.bio}</p>
+                <div className="space-y-1.5 text-center sm:text-left">
+                  <h4 className="font-serif text-2xl font-bold text-white">{agent.name}</h4>
+                  <p className="text-xs text-[#C5A880] uppercase tracking-widest font-semibold">{agent.title}</p>
+                  <p className="text-xs text-zinc-400 max-w-md pt-1 leading-relaxed">{agent.bio}</p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-4 border-t border-white/10">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-6 border-t border-white/10">
                 <a
                   href={whatsappUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="py-3 bg-[#25D366] text-white text-xs font-semibold uppercase tracking-wider rounded-xs hover:bg-[#20ba59] transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                  className="py-3.5 bg-[#25D366] text-white text-xs font-semibold uppercase tracking-widest rounded-full hover:bg-[#20ba59] transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-lg"
                 >
                   <MessageSquare className="w-4 h-4" />
                   <span>WhatsApp Agent</span>
@@ -241,7 +241,7 @@ export default function PropertyDetails({ onOpenInquiryModal }) {
 
                 <button
                   onClick={() => onOpenInquiryModal ? onOpenInquiryModal(property.title) : navigate('/contact')}
-                  className="py-3 bg-[#C5A880] text-[#121417] text-xs font-semibold uppercase tracking-wider rounded-xs hover:bg-[#b5966c] transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                  className="py-3.5 bg-[#C5A880] text-[#0E1013] text-xs font-semibold uppercase tracking-widest rounded-full hover:bg-[#b5966c] transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-lg"
                 >
                   <Calendar className="w-4 h-4" />
                   <span>Book Private Tour</span>
@@ -253,28 +253,28 @@ export default function PropertyDetails({ onOpenInquiryModal }) {
 
           {/* Sticky Desktop Enquiry Panel (1 Column) */}
           <div className="hidden lg:block lg:col-span-1">
-            <div className="sticky top-28 bg-white p-6 rounded-xs border border-stone-200/80 shadow-xl space-y-6">
+            <div className="sticky top-28 bg-white p-8 rounded-[36px] border border-stone-200/80 shadow-xl space-y-6">
               
               <div>
                 <span className="text-[10px] uppercase tracking-widest text-[#C5A880] font-semibold block">
                   Private Representation
                 </span>
-                <h3 className="font-serif text-xl font-bold text-[#121417] mt-1">Inquire About This Estate</h3>
-                <p className="text-xs text-zinc-500 mt-1">
+                <h3 className="font-serif text-xl font-bold text-[#0E1013] mt-1">Inquire About This Estate</h3>
+                <p className="text-xs text-zinc-500 mt-1 font-light leading-relaxed">
                   Schedule a private walk-through or request structural floor plans.
                 </p>
               </div>
 
-              <div className="p-4 bg-[#FAF8F5] rounded-xs border border-stone-200 text-xs space-y-2">
+              <div className="p-5 bg-[#FAF8F5] rounded-[24px] border border-stone-200/80 text-xs space-y-3">
                 <div className="flex justify-between text-zinc-600">
                   <span>Listing ID:</span>
-                  <strong className="text-zinc-900">{property.id.toUpperCase()}</strong>
+                  <strong className="text-zinc-900 font-mono">{property.id.toUpperCase()}</strong>
                 </div>
                 <div className="flex justify-between text-zinc-600">
                   <span>Location:</span>
                   <strong className="text-zinc-900">{property.areaName}</strong>
                 </div>
-                <div className="flex justify-between text-zinc-600">
+                <div className="flex justify-between text-zinc-600 border-t border-stone-200/60 pt-2">
                   <span>Guide Price:</span>
                   <strong className="text-[#C5A880] font-serif font-bold text-sm">{property.formattedPrice}</strong>
                 </div>
@@ -284,9 +284,9 @@ export default function PropertyDetails({ onOpenInquiryModal }) {
               <div className="space-y-3">
                 <button
                   onClick={() => onOpenInquiryModal ? onOpenInquiryModal(property.title) : navigate('/contact')}
-                  className="w-full py-3.5 bg-[#121417] text-white text-xs font-semibold uppercase tracking-widest rounded-xs hover:bg-[#C5A880] hover:text-[#121417] transition-colors shadow-md flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full py-4 bg-[#0E1013] text-white text-xs font-semibold uppercase tracking-widest rounded-full hover:bg-[#C5A880] hover:text-[#0E1013] transition-colors shadow-lg flex items-center justify-center gap-2 cursor-pointer border border-[#C5A880]/30"
                 >
-                  <Calendar className="w-4 h-4" />
+                  <Calendar className="w-4 h-4 text-[#C5A880]" />
                   <span>Schedule Private Visit</span>
                 </button>
 
@@ -294,7 +294,7 @@ export default function PropertyDetails({ onOpenInquiryModal }) {
                   href={whatsappUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full py-3 bg-[#25D366]/10 border border-[#25D366]/30 text-[#128C7E] hover:bg-[#25D366] hover:text-white text-xs font-semibold uppercase tracking-widest rounded-xs transition-colors flex items-center justify-center gap-2"
+                  className="w-full py-3.5 bg-[#25D366]/10 border border-[#25D366]/30 text-[#128C7E] hover:bg-[#25D366] hover:text-white text-xs font-semibold uppercase tracking-widest rounded-full transition-colors flex items-center justify-center gap-2"
                 >
                   <MessageSquare className="w-4 h-4" />
                   <span>WhatsApp Advisor</span>
@@ -312,23 +312,23 @@ export default function PropertyDetails({ onOpenInquiryModal }) {
 
         {/* 4. SIMILAR FEATURED PROPERTIES */}
         {similarProperties.length > 0 && (
-          <div className="mt-24 pt-12 border-t border-stone-200 space-y-8">
+          <div className="mt-24 pt-12 border-t border-stone-200/80 space-y-8">
             <div className="flex items-center justify-between">
               <div>
                 <span className="text-xs uppercase tracking-widest text-[#C5A880] font-semibold block">
                   Recommended Estates
                 </span>
-                <h3 className="font-serif text-2xl font-bold text-[#121417]">
+                <h3 className="font-serif text-2xl sm:text-3xl font-bold text-[#0E1013]">
                   Similar Luxury Residences
                 </h3>
               </div>
 
               <Link
                 to="/properties"
-                className="text-xs font-semibold uppercase tracking-widest text-[#121417] hover:text-[#C5A880] flex items-center gap-1"
+                className="px-5 py-2.5 rounded-full border border-stone-200 text-xs font-semibold uppercase tracking-wider text-[#0E1013] hover:border-[#C5A880] flex items-center gap-1.5 transition-colors"
               >
                 <span>Browse All</span>
-                <ChevronRight className="w-4 h-4" />
+                <ChevronRight className="w-4 h-4 text-[#C5A880]" />
               </Link>
             </div>
 
@@ -343,10 +343,10 @@ export default function PropertyDetails({ onOpenInquiryModal }) {
       </div>
 
       {/* Floating Mobile Bottom Action Bar */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#121417] border-t border-white/10 p-3 flex items-center justify-between shadow-2xl">
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0E1013]/95 backdrop-blur-md border-t border-[#C5A880]/30 p-3.5 flex items-center justify-between shadow-2xl">
         <div>
-          <span className="text-[10px] uppercase text-zinc-400 block">Listing Price</span>
-          <span className="font-serif font-bold text-white text-base">{property.formattedPrice}</span>
+          <span className="text-[10px] uppercase text-zinc-400 block tracking-wider">Listing Price</span>
+          <span className="font-serif font-bold text-white text-lg">{property.formattedPrice}</span>
         </div>
 
         <div className="flex items-center gap-2">
@@ -354,14 +354,14 @@ export default function PropertyDetails({ onOpenInquiryModal }) {
             href={whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="p-2.5 bg-[#25D366] text-white rounded-xs"
+            className="p-3 bg-[#25D366] text-white rounded-full"
           >
             <MessageSquare className="w-4 h-4" />
           </a>
 
           <button
             onClick={() => onOpenInquiryModal ? onOpenInquiryModal(property.title) : navigate('/contact')}
-            className="px-4 py-2.5 bg-[#C5A880] text-[#121417] text-xs font-semibold uppercase tracking-wider rounded-xs"
+            className="px-5 py-3 bg-[#C5A880] text-[#0E1013] text-xs font-semibold uppercase tracking-wider rounded-full shadow-lg"
           >
             Schedule Tour
           </button>
