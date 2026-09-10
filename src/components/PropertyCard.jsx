@@ -43,11 +43,10 @@ export default function PropertyCard({ property }) {
 
         {/* Floating Curved Badges */}
         <div className="absolute top-4 left-4 flex flex-wrap gap-2 z-10">
-          <span className={`px-3.5 py-1 text-[10px] font-bold tracking-widest uppercase rounded-full border backdrop-blur-md ${
-            isCompleted 
-              ? 'bg-[#121417]/90 text-[#C5A880] border-[#C5A880]/40' 
+          <span className={`px-3.5 py-1 text-[10px] font-bold tracking-widest uppercase rounded-full border backdrop-blur-md ${isCompleted
+              ? 'bg-[#121417]/90 text-[#C5A880] border-[#C5A880]/40'
               : 'bg-[#C5A880] text-[#121417] border-[#C5A880]'
-          }`}>
+            }`}>
             {property.badge || (isCompleted ? 'Ready to Move' : 'Premium Residence')}
           </span>
 
@@ -65,11 +64,10 @@ export default function PropertyCard({ property }) {
             e.stopPropagation();
             toggleFavorite(property.id);
           }}
-          className={`absolute top-4 right-4 z-10 p-2.5 rounded-full backdrop-blur-md transition-all duration-300 cursor-pointer shadow-lg ${
-            favorite
+          className={`absolute top-4 right-4 z-10 p-2.5 rounded-full backdrop-blur-md transition-all duration-300 cursor-pointer shadow-lg ${favorite
               ? 'bg-rose-600 text-white'
               : 'bg-black/40 text-white hover:bg-white hover:text-rose-600 border border-white/20'
-          }`}
+            }`}
           aria-label="Save to favorites"
         >
           <Heart className={`w-4 h-4 ${favorite ? 'fill-current' : ''}`} />

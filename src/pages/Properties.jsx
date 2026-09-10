@@ -178,7 +178,7 @@ export default function Properties() {
   }, [filters, favorites, allProperties]);
 
   return (
-    <div className="min-h-screen bg-[#FAF8F5] pt-24 pb-20">
+    <div className="min-h-screen bg-[#FAF8F5]/80 backdrop-blur-xs pt-24 pb-20">
       
       {/* Banner Header with Integrated Search & Filter UI */}
       <section className="bg-[#0E1013] text-white py-20 mb-12 border-b border-white/10 relative overflow-hidden">

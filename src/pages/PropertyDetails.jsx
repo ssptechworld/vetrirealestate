@@ -86,7 +86,7 @@ export default function PropertyDetails({ onOpenInquiryModal }) {
   )}`;
 
   return (
-    <div className="min-h-screen bg-[#FAF8F5] pt-28 pb-24">
+    <div className="min-h-screen bg-[#FAF8F5]/80 backdrop-blur-xs pt-28 pb-24">
       
       {/* Breadcrumb & Navigation Back Bar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">

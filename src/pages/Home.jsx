@@ -25,6 +25,7 @@ import StatsSection from '../components/StatsSection';
 import { PROPERTIES_DATA } from '../data/properties';
 import { fadeUp, staggerContainer, EASE_LUXURY } from '../utils/animations';
 import homeHeroImg from '../assets/Home.png';
+import backgroundAsset from '../assets/Background.png';
 import workVideo from '../assets/work.mp4';
 import builtByUsBg from '../assets/built_by_us_bg.jpg';
 import Medavakkam from '../assets/Medavakkam.png';
@@ -211,16 +212,27 @@ export default function Home({ onOpenInquiryModal }) {
   ];
 
   return (
-    <div className="min-h-screen bg-[#FAF8F5] overflow-hidden">
+    <div className="min-h-screen bg-transparent overflow-hidden">
 
       {/* 1. ARCHITECTURAL HERO SECTION WITH GRAND ARCH FRAME */}
-      <section className="relative pt-32 pb-20 sm:pt-40 sm:pb-28 bg-[#0E1013] text-white">
+      <section className="relative pt-32 pb-24 sm:pt-40 sm:pb-36 lg:pb-44 bg-[#0E1013] text-white overflow-hidden">
+        {/* Full Section Background Image (Home.png) */}
+        <div className="absolute inset-0 z-0 overflow-hidden">
+          <img
+            src={homeHeroImg}
+            alt=""
+            className="w-full h-full object-cover object-center scale-105"
+          />
+          {/* Sophisticated Dark Cinematic Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#0E1013]/85 via-[#0E1013]/55 to-[#0E1013]/80" />
+        </div>
+
         {/* Soft Background Radial Light Orbs */}
-        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 z-[1] overflow-hidden">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-[radial-gradient(ellipse_70%_60%_at_50%_0%,rgba(197,168,128,0.22)_0%,transparent_75%)] blur-3xl" />
         </div>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-8">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-8 pb-10 sm:pb-16">
 
           {/* Curved Pill Status Badge */}
           <motion.div
@@ -280,41 +292,22 @@ export default function Home({ onOpenInquiryModal }) {
             </button>
           </motion.div>
 
-          {/* Grand Architectural Arch Frame Visual */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 40 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ duration: 1.1, delay: 0.8, ease: EASE_LUXURY }}
-            className="relative max-w-5xl mx-auto pt-6"
-          >
-            <div className="relative aspect-[16/9] sm:aspect-[21/9] overflow-hidden rounded-t-[140px] sm:rounded-t-[260px] rounded-b-[36px] sm:rounded-b-[48px] border-2 border-white/20 shadow-2xl group">
-              <img
-                src={homeHeroImg}
-                alt="Architectural Masterpiece Completed Residence"
-                className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-1000 ease-out"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0E1013] via-transparent to-[#0E1013]/30" />
-
-              {/* Floating Architectural Badge */}
-              <div className="absolute bottom-6 left-6 right-6 flex items-end justify-between z-10 text-white">
-                <div className="bg-[#0E1013]/85 backdrop-blur-md px-5 py-3 rounded-full border border-white/20 flex items-center gap-3">
-                  <div className="w-2.5 h-2.5 rounded-full bg-[#C5A880] animate-pulse" />
-                  <span className="text-xs font-bold tracking-widest uppercase text-stone-200">
-                    Grand Completed Sanctuary Handover
-                  </span>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-
         </div>
 
-        {/* Concave SVG Section Curve Divider */}
-        <div className="w-full overflow-hidden leading-none mt-16">
-          <svg viewBox="0 0 1440 100" className="w-full h-12 sm:h-20 text-[#FAF8F5] fill-current" preserveAspectRatio="none">
-            <path d="M0,0 C480,100 960,100 1440,0 L1440,100 L0,100 Z"></path>
+        {/* Large Architectural Wave Section Divider */}
+        <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-none z-10 pointer-events-none">
+          <svg
+            viewBox="0 0 1440 160"
+            className="relative block w-full h-[80px] sm:h-[110px] md:h-[140px]"
+            preserveAspectRatio="none"
+          >
+            <path
+              d="M0,32 C360,150 1080,150 1440,32 L1440,160 L0,160 Z"
+              fill="#FAF8F5"
+            />
           </svg>
         </div>
+
       </section>
 
       {/* 2. PROJECT STORYTELLING: VISION TO YOUR HOME WITH CURVED CARDS */}
@@ -383,58 +376,60 @@ export default function Home({ onOpenInquiryModal }) {
       </section>
 
       {/* 3. FEATURED SHOWCASE: COMPLETED RESIDENCES */}
-      <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-20 bg-white text-[#121417]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-        {/* Section Header */}
-        <motion.div
-          variants={fadeUp}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-50px" }}
-          className="flex flex-col md:flex-row md:items-end justify-between mb-12 border-b border-stone-200 pb-6"
-        >
-          <div>
-            <span className="text-xs uppercase tracking-[0.2em] text-[#C5A880] font-bold block mb-2">
-              READY FOR OCCUPANCY
-            </span>
-            <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#121417]">
-              Completed Residences Showcase
-            </h2>
-            <p className="text-xs text-stone-500 mt-1 font-light">
-              Explore completed apartments with verified handovers and ready key access.
-            </p>
-          </div>
-
-          <Link
-            to="/properties"
-            className="mt-4 md:mt-0 text-xs uppercase tracking-[0.2em] text-[#121417] hover:text-[#C5A880] font-bold flex items-center gap-2 transition-colors group"
+          {/* Section Header */}
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-50px" }}
+            className="flex flex-col md:flex-row md:items-end justify-between mb-12 border-b border-stone-200 pb-6"
           >
-            <span>Explore All Projects</span>
-            <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-          </Link>
-        </motion.div>
-
-        {/* Properties Carousel */}
-        <motion.div
-          variants={fadeUp}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-50px" }}
-        >
-          {loadingCompleted ? (
-            <div className="py-16 flex justify-center items-center gap-3 text-[#C5A880]">
-              <div className="w-5 h-5 border-2 border-[#C5A880] border-t-transparent rounded-full animate-spin" />
-              <span className="uppercase tracking-widest font-bold text-xs text-stone-600">Loading Completed Residences...</span>
+            <div>
+              <span className="text-xs uppercase tracking-[0.2em] text-[#C5A880] font-bold block mb-2">
+                READY FOR OCCUPANCY
+              </span>
+              <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#121417]">
+                Completed Residences Showcase
+              </h2>
+              <p className="text-xs text-stone-500 mt-1 font-light">
+                Explore completed apartments with verified handovers and ready key access.
+              </p>
             </div>
-          ) : completedProperties.length > 0 ? (
-            <PropertyCarousel properties={completedProperties} />
-          ) : (
-            <div className="py-12 text-center text-stone-500 bg-white border border-stone-200/80 rounded-3xl">
-              <p className="text-sm font-medium">No completed projects currently listed in database.</p>
-            </div>
-          )}
-        </motion.div>
 
+            <Link
+              to="/properties"
+              className="mt-4 md:mt-0 text-xs uppercase tracking-[0.2em] text-[#121417] hover:text-[#C5A880] font-bold flex items-center gap-2 transition-colors group"
+            >
+              <span>Explore All Projects</span>
+              <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+            </Link>
+          </motion.div>
+
+          {/* Properties Carousel */}
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-50px" }}
+          >
+            {loadingCompleted ? (
+              <div className="py-16 flex justify-center items-center gap-3 text-[#C5A880]">
+                <div className="w-5 h-5 border-2 border-[#C5A880] border-t-transparent rounded-full animate-spin" />
+                <span className="uppercase tracking-widest font-bold text-xs text-stone-600">Loading Completed Residences...</span>
+              </div>
+            ) : completedProperties.length > 0 ? (
+              <PropertyCarousel properties={completedProperties} />
+            ) : (
+              <div className="py-12 text-center text-stone-500 bg-[#FAF8F5] border border-stone-200/80 rounded-3xl">
+                <p className="text-sm font-medium">No completed projects currently listed in database.</p>
+              </div>
+            )}
+          </motion.div>
+
+        </div>
       </section>
 
       {/* 4. ONGOING PROJECTS SECTION */}

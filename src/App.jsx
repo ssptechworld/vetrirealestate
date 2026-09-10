@@ -18,6 +18,8 @@ import AdminProjectList from './pages/admin/AdminProjectList';
 import AdminProjectForm from './pages/admin/AdminProjectForm';
 import AdminGallery from './pages/admin/AdminGallery';
 
+import backgroundImage from './assets/Background.png';
+
 export default function App() {
   const [inquiryModalOpen, setInquiryModalOpen] = useState(false);
   const [modalPropertyTitle, setModalPropertyTitle] = useState('');
@@ -36,7 +38,19 @@ export default function App() {
     <FavoritesProvider>
       <Router>
         <ScrollToTop />
-        <div className="flex flex-col min-h-screen bg-[#FAF8F5] text-[#121417]">
+
+        {/* Global Website Background Layer */}
+        <div className="fixed inset-0 -z-50 pointer-events-none overflow-hidden">
+          <img
+            src={backgroundImage}
+            alt=""
+            className="w-full h-full object-cover object-center"
+          />
+          {/* Subtle Dark Overlay for Optimal Contrast Across All Routes */}
+          <div className="absolute inset-0 bg-[#0E1013]/25" />
+        </div>
+
+        <div className="flex flex-col min-h-screen text-[#121417] relative z-0">
           
           <Navbar onOpenInquiryModal={() => handleOpenInquiryModal()} />
 

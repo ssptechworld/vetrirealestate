@@ -80,7 +80,7 @@ export default function Gallery() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF8F5] pt-24 pb-24 text-[#121417]">
+    <div className="min-h-screen bg-[#FAF8F5]/80 backdrop-blur-xs pt-24 pb-24 text-[#121417]">
       
       {/* Dark Architectural Hero Banner */}
       <section className="relative py-20 sm:py-28 bg-[#0E1013] text-white overflow-hidden mb-16 border-b border-white/10">

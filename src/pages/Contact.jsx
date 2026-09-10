@@ -37,7 +37,7 @@ export default function Contact() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#FAF8F5] pt-28 pb-24">
+    <div className="min-h-screen bg-[#FAF8F5]/80 backdrop-blur-xs pt-28 pb-24">
       
       {/* Header Banner */}
       <section className="bg-[#0E1013] text-white pt-16 pb-20 mb-16 border-b border-[#C5A880]/20 rounded-b-[48px] sm:rounded-b-[80px] shadow-2xl relative overflow-hidden">
