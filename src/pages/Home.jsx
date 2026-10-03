@@ -10,26 +10,50 @@ import {
   Layers,
   Volume2,
   VolumeX,
-  Building2,
-  Compass,
-  KeyRound,
-  HeartHandshake,
-  MapPin,
   Calendar,
   Quote,
-  Star
+  Star,
+  BrickWall,
+  Package,
+  Grid2X2,
+  CookingPot,
+  DoorOpen,
+  ArrowUpDown,
+  Bath,
+  Zap,
+  Car,
+  Fingerprint,
+  Cctv,
+  Sun,
+  Building,
+  Timer,
+  Warehouse,
+  Droplets,
+  Sprout,
+  Gamepad2,
+  PlugZap
 } from 'lucide-react';
-import PropertyCard from '../components/PropertyCard';
 import PropertyCarousel from '../components/PropertyCarousel';
 import StatsSection from '../components/StatsSection';
 import { PROPERTIES_DATA } from '../data/properties';
 import { fadeUp, staggerContainer, EASE_LUXURY } from '../utils/animations';
 import homeHeroImg from '../assets/Home.png';
-import backgroundAsset from '../assets/Background.png';
 import workVideo from '../assets/work.mp4';
 import builtByUsBg from '../assets/built_by_us_bg.jpg';
 import Medavakkam from '../assets/Medavakkam.png';
 import Porur from '../assets/Porur.png';
+
+// Brand & Material Image Assets
+import redBrickImg from '../assets/redbrick.png';
+import dalmiaCementImg from '../assets/Dalmia.png';
+import isteelTmtImg from '../assets/Steel.png';
+import somanyTilesImg from '../assets/Sowmi.png';
+import kitchenCountertopImg from '../assets/Aashirvad.png';
+import smartSecurityImg from '../assets/brands/smart-security.jpg';
+import powerLightingImg from '../assets/Polycab.png';
+import digitalLockImg from '../assets/Goorej.png';
+import luxuryElevatorImg from '../assets/Lift.png';
+import jaquarBathroomImg from '../assets/Jaquar.png';
 
 import { getOngoingProjects, getCompletedProjects, formatProjectForCarousel } from '../services/projectService';
 
@@ -91,75 +115,149 @@ export default function Home({ onOpenInquiryModal }) {
     };
   }, []);
 
-  const storySteps = [
+  const amenities = [
     {
-      step: "01",
-      title: "VISION",
-      subtitle: "Thoughtful Master Plan",
-      desc: "Conceptualized for modern family living with maximum spatial efficiency, Vastu alignment, and natural daylighting."
+      title: "Covered Car Parking",
+      icon: Car
     },
     {
-      step: "02",
-      title: "DESIGN",
-      subtitle: "Architectural Precision",
-      desc: "Engineered by leading structural architects with climate-responsive facades and luxury ventilation corridors."
+      title: "Biometric Access",
+      icon: Fingerprint
     },
     {
-      step: "03",
-      title: "CONSTRUCTION",
-      subtitle: "Uncompromised Integrity",
-      desc: "Built using seismic RCC foundations, certified grade steel, premium teak joinery, and imported stone finishes."
+      title: "24×7 CCTV Surveillance",
+      icon: Cctv
     },
     {
-      step: "04",
-      title: "COMPLETION",
-      subtitle: "Flawless Handover",
-      desc: "Rigorous 100-point structural inspection and full statutory clearances before keys are delivered."
+      title: "Solar Power Provision for Common Areas",
+      icon: Sun
     },
     {
-      step: "05",
-      title: "YOUR HOME",
-      subtitle: "Ready For Modern Living",
-      desc: "Step directly into a completed apartment with complete legal titles, zero waiting, and immediate peace of mind."
+      title: "Spacious Floor Lobby on Each Level for Comfortable Circulation",
+      icon: Building
+    },
+    {
+      title: "Timer Controlled Lighting Throughout All Common Spaces",
+      icon: Timer
+    },
+    {
+      title: "Utility Space at Terrace",
+      icon: Warehouse
+    },
+    {
+      title: "Online Delivery Drop Box",
+      icon: Package
+    },
+    {
+      title: "Automatic Pump Cut-Off for Efficient Water Management",
+      icon: Droplets
+    },
+    {
+      title: "Mini-Urban Farm / Edible Garden Beds",
+      icon: Sprout
+    },
+    {
+      title: "Interactive Kids' Zone with Sensor Play",
+      icon: Gamepad2
+    },
+    {
+      title: "Yoga / Meditation Deck",
+      icon: Sparkles
+    },
+    {
+      title: "Lift Till Terrace",
+      icon: ArrowUpDown
+    },
+    {
+      title: "EV Charging Provision",
+      icon: PlugZap
+    },
+    {
+      title: "Fully Automated Main Gate",
+      icon: DoorOpen
     }
   ];
 
-  const trustPillars = [
+  const constructionMaterials = [
     {
-      num: "01",
-      icon: Building2,
-      title: "QUALITY CONSTRUCTION",
-      desc: "Seismic-resistant RCC structural framing, premium teak doors, and grade-A certified materials in every building."
+      category: "STRUCTURE",
+      brand: "Red Brick",
+      title: "Red Brick for All Masonry Works",
+      desc: "Red brick for all masonry works.",
+      icon: BrickWall,
+      image: redBrickImg
     },
     {
-      num: "02",
-      icon: MapPin,
-      title: "PREMIUM LOCATIONS",
-      desc: "Strategic sites along East Coast Road, Boat Club, Adyar, and key metropolitan corridors with high appreciation."
+      category: "STRUCTURE",
+      brand: "Dalmia Cement",
+      title: "RCC Framed with iSteel Reinforcement",
+      desc: "RCC framed with iSteel reinforcement, Dalmia Cement & foundation for strength.",
+      icon: Package,
+      image: dalmiaCementImg
     },
     {
-      num: "03",
-      icon: Compass,
-      title: "THOUGHTFUL DESIGN",
-      desc: "Optimum floor planning with 100% Vastu compliance, cross-ventilation, and generous natural daylighting."
+      category: "STRUCTURE",
+      brand: "iSTEEL XLS",
+      title: "Long Life TMT Bars",
+      desc: "iSTEEL XLS long life TMT bars for strong and reliable structural construction.",
+      icon: Layers,
+      image: isteelTmtImg
     },
     {
-      num: "04",
+      category: "FLOORING",
+      brand: "Somany",
+      title: "Premium Vitrified & Anti-Skid Tiles",
+      desc: "Living, dining, bedrooms & kitchen - 4' x 2' premium vitrified tiles. Anti-skid ceramic tiles in toilets. Anti-skid tiles in balconies & white cooling tiles in terrace.",
+      icon: Grid2X2,
+      image: somanyTilesImg
+    },
+    {
+      category: "KITCHEN",
+      brand: "Aashirvad Pipes",
+      title: "Granite Countertop & Plumbing Provision",
+      desc: "Granite countertop with Aashirvad plumbing and provisions for hob, chimney & purifier.",
+      icon: CookingPot,
+      image: kitchenCountertopImg
+    },
+    {
+      category: "SMART ACCESS & SECURITY",
+      brand: "Hikvision",
+      title: "Smart Access & Security",
+      desc: "Biometric access at the main lobby and all individual units. 24×7 CCTV surveillance covering all critical areas. Fully automated main gate with remote/app-based operation.",
       icon: ShieldCheck,
-      title: "TRANSPARENT PROCESS",
-      desc: "Clean legal documentation, clear approvals, and absolute clarity with zero hidden costs at handover."
+      image: smartSecurityImg
     },
     {
-      num: "05",
-      icon: KeyRound,
-      title: "READY-TO-MOVE HOMES",
-      desc: "Skip long waiting periods. Explore fully completed residences ready for immediate occupancy today."
+      category: "POWER & LIGHTING",
+      brand: "Legrand & Orbit",
+      title: "Power & Lighting",
+      desc: "EV charging provision. Timer-controlled lighting throughout all common spaces.",
+      icon: Zap,
+      image: powerLightingImg
     },
     {
-      num: "06",
-      icon: HeartHandshake,
-      title: "CUSTOMER TRUST",
-      desc: "Over 500+ happy families residing in Vetri Vel developments across Tamil Nadu with ongoing support."
+      category: "DOORS & WINDOWS",
+      brand: "Godrej Locks",
+      title: "Premium Doors, Windows & Digital Lock",
+      desc: "Main door with Yale / Godrej digital lock, uPVC windows & French doors with toughened glass.",
+      icon: DoorOpen,
+      image: digitalLockImg
+    },
+    {
+      category: "LIFT",
+      brand: "Johnson",
+      title: "Johnson Elevator",
+      desc: "Johnson elevator with terrace access.",
+      icon: ArrowUpDown,
+      image: luxuryElevatorImg
+    },
+    {
+      category: "BATHROOM",
+      brand: "Jaquar",
+      title: "Premium Bathroom Fittings",
+      desc: "Premium Jaquar fittings crafted for long-lasting comfort, performance, and refined style.",
+      icon: Bath,
+      image: jaquarBathroomImg
     }
   ];
 
@@ -310,70 +408,7 @@ export default function Home({ onOpenInquiryModal }) {
 
       </section>
 
-      {/* 2. PROJECT STORYTELLING: VISION TO YOUR HOME WITH CURVED CARDS */}
-      <section className="py-16 sm:py-24 bg-[#FAF8F5] text-[#121417]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-          <motion.div
-            variants={fadeUp}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-50px" }}
-            className="text-center max-w-3xl mx-auto mb-16 space-y-3"
-          >
-            <span className="text-xs uppercase tracking-[0.25em] text-[#C5A880] font-bold block">
-              Architectural Storytelling
-            </span>
-            <h2 className="font-serif text-3xl sm:text-5xl font-bold tracking-tight text-[#121417]">
-              From Vision to Your Ready Home
-            </h2>
-            <p className="text-stone-600 text-xs sm:text-sm font-light max-w-xl mx-auto">
-              Every completed Vetri Vel residence follows a disciplined journey of design integrity, seismic construction, and timely handover.
-            </p>
-          </motion.div>
-
-          {/* Curved Pill Cards Story Grid */}
-          <motion.div
-            variants={staggerContainer(0.12, 0.1)}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-50px" }}
-            className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6"
-          >
-            {storySteps.map((step, idx) => (
-              <motion.div
-                key={idx}
-                variants={fadeUp}
-                whileHover={{ y: -8 }}
-                className="bg-white p-7 rounded-[36px] border border-stone-200/90 hover:border-[#C5A880]/70 shadow-md hover:shadow-2xl transition-all duration-300 flex flex-col justify-between space-y-5 group relative"
-              >
-                <div className="space-y-3">
-                  <span className="text-3xl font-serif font-bold text-[#C5A880]">
-                    {step.step}
-                  </span>
-                  <div>
-                    <h3 className="font-serif text-lg font-bold text-[#121417] group-hover:text-[#C5A880] transition-colors">
-                      {step.title}
-                    </h3>
-                    <p className="text-[10px] font-bold text-stone-400 tracking-widest uppercase mt-0.5">
-                      {step.subtitle}
-                    </p>
-                  </div>
-                  <p className="text-xs text-stone-600 font-light leading-relaxed">
-                    {step.desc}
-                  </p>
-                </div>
-
-                <div className="pt-3 border-t border-stone-100 flex items-center justify-between text-[10px] text-[#C5A880] uppercase tracking-widest font-bold">
-                  <span>Step {idx + 1}</span>
-                  <ChevronRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-
-        </div>
-      </section>
 
       {/* 3. FEATURED SHOWCASE: COMPLETED RESIDENCES */}
       <section className="py-20 bg-white text-[#121417]">
@@ -486,7 +521,7 @@ export default function Home({ onOpenInquiryModal }) {
         </div>
       </section>
 
-      {/* 5. "WHY CHOOSE US" / TRUST PILLARS SECTION WITH FLOATING CARDS */}
+      {/* 5. QUALITY MATERIALS & TRUST / BUILT WITH TRUSTED BRANDS */}
       <section className="py-24 bg-[#FAF8F5]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
@@ -498,49 +533,135 @@ export default function Home({ onOpenInquiryModal }) {
             className="text-center max-w-3xl mx-auto mb-16 space-y-3"
           >
             <span className="text-xs uppercase tracking-[0.25em] text-[#C5A880] font-bold block">
-              REAL VALUE & TRUST
+              QUALITY MATERIALS & TRUST
             </span>
             <h2 className="font-serif text-3xl sm:text-5xl font-bold text-[#121417]">
-              Why Choose Vetri Vel Real Estate
+              Built With Trusted Brands
             </h2>
             <p className="text-stone-600 text-xs sm:text-sm max-w-xl mx-auto font-light">
-              Built on uncompromising engineering standards, clear legal titles, and authentic customer relationships.
+              We use quality construction materials and trusted brands to ensure durability, safety, comfort, and long-term value for every home.
             </p>
           </motion.div>
 
-          {/* 6 Curved Floating Cards */}
+          {/* 10 Luxury Material Specification Cards */}
           <motion.div
-            variants={staggerContainer(0.1, 0.1)}
+            variants={staggerContainer(0.08, 0.1)}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-50px" }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8"
           >
-            {trustPillars.map((p, i) => {
-              const Icon = p.icon;
+            {constructionMaterials.map((item, i) => {
+              const Icon = item.icon;
               return (
                 <motion.div
                   key={i}
                   variants={fadeUp}
-                  whileHover={{ y: -8 }}
-                  className="bg-white p-8 rounded-[36px] border border-stone-200/90 shadow-md hover:shadow-2xl transition-all duration-300 space-y-4 relative group"
+                  whileHover={{ y: -6 }}
+                  className="group relative bg-white rounded-[28px] sm:rounded-[32px] border border-stone-200/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_16px_36px_rgba(0,0,0,0.08)] transition-all duration-300 overflow-hidden min-h-[260px] p-6 sm:p-7 flex flex-col justify-between"
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="w-13 h-13 rounded-full bg-[#FAF8F5] border border-[#C5A880]/40 text-[#C5A880] flex items-center justify-center group-hover:bg-[#121417] group-hover:text-white transition-colors duration-300">
-                      <Icon className="w-6 h-6" />
-                    </div>
-                    <span className="text-2xl font-serif font-bold text-[#C5A880]">
-                      {p.num}
-                    </span>
+                  {/* Right Side Material Image with Soft Gradient Fade */}
+                  <div className="absolute top-0 right-0 bottom-0 w-[44%] sm:w-[45%] pointer-events-none overflow-hidden">
+                    <img
+                      src={item.image}
+                      alt={item.brand}
+                      className="w-full h-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+                      loading="lazy"
+                    />
+                    {/* Left-to-right white gradient mask for seamless natural blend into card */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-white via-white/50 to-transparent" />
                   </div>
 
-                  <h3 className="font-serif text-lg font-bold text-[#121417] group-hover:text-[#C5A880] transition-colors">
-                    {p.title}
-                  </h3>
+                  {/* Left Side Content Container */}
+                  <div className="relative z-10 max-w-[62%] sm:max-w-[58%] flex flex-col h-full justify-between space-y-4">
+                    <div>
+                      {/* Small category icon & uppercase label */}
+                      <div className="w-8 h-8 rounded-full border border-[#C5A880]/50 bg-[#FAF8F5] text-[#C5A880] flex items-center justify-center mb-2.5 group-hover:bg-[#121417] group-hover:text-white group-hover:border-[#121417] transition-colors duration-300 shrink-0">
+                        <Icon className="w-4 h-4" />
+                      </div>
+                      <span className="text-[10px] font-bold tracking-[0.22em] text-stone-400 uppercase block mb-1">
+                        {item.category}
+                      </span>
 
-                  <p className="text-xs text-stone-600 leading-relaxed font-light">
-                    {p.desc}
-                  </p>
+                      {/* Brand Name */}
+                      <h3 className="font-serif text-xl sm:text-2xl font-bold text-[#C5A880] leading-tight block mb-1">
+                        {item.brand}
+                      </h3>
+
+                      {/* Specification Title */}
+                      <h4 className="font-serif text-sm sm:text-[15px] font-bold text-[#121417] leading-snug">
+                        {item.title}
+                      </h4>
+                    </div>
+
+                    {/* Short Specification Description */}
+                    <p className="text-xs text-stone-600 leading-relaxed font-light">
+                      {item.desc}
+                    </p>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </motion.div>
+
+        </div>
+      </section>
+      {/* AMENITIES SECTION */}
+      <section className="py-20 sm:py-28 bg-[#FAF8F5] text-[#121417]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-50px" }}
+            className="text-center max-w-3xl mx-auto mb-16 space-y-3"
+          >
+            <span className="text-xs uppercase tracking-[0.25em] text-[#C5A880] font-bold block">
+              CURATED COMFORTS & CONVENIENCE
+            </span>
+            <h2 className="font-serif text-3xl sm:text-5xl font-bold tracking-tight text-[#121417]">
+              AMENITIES
+            </h2>
+            <p className="text-stone-600 text-xs sm:text-sm font-light max-w-xl mx-auto">
+              Thoughtfully planned features and modern conveniences designed to elevate everyday living.
+            </p>
+          </motion.div>
+
+          {/* 15 Amenities Grid */}
+          <motion.div
+            variants={staggerContainer(0.06, 0.1)}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-50px" }}
+            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-5 lg:gap-6"
+          >
+            {amenities.map((item, idx) => {
+              const Icon = item.icon;
+              return (
+                <motion.div
+                  key={idx}
+                  variants={fadeUp}
+                  whileHover={{ y: -6 }}
+                  className="group bg-white p-6 rounded-[24px] sm:rounded-[28px] border border-stone-200/80 hover:border-[#C5A880]/60 shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col items-center text-center justify-start min-h-[190px] relative overflow-hidden"
+                >
+                  {/* Subtle Gold Hover Glow */}
+                  <div className="absolute -top-10 -right-10 w-20 h-20 bg-[#C5A880]/10 rounded-full blur-xl group-hover:bg-[#C5A880]/25 transition-all duration-500 pointer-events-none" />
+
+                  {/* Circular Icon Area */}
+                  <div className="w-13 h-13 rounded-full bg-[#FAF8F5] border border-[#C5A880]/40 text-[#C5A880] flex items-center justify-center group-hover:bg-[#121417] group-hover:text-white group-hover:border-[#121417] transition-all duration-300 mb-3 shrink-0 shadow-xs">
+                    <Icon className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
+                  </div>
+
+                  {/* Amenity Number */}
+                  <span className="text-[10px] font-bold tracking-[0.2em] text-[#C5A880] uppercase block mb-1.5">
+                    {String(idx + 1).padStart(2, '0')}
+                  </span>
+
+                  {/* Amenity Title */}
+                  <h3 className="font-serif text-sm sm:text-[15px] font-bold text-[#121417] group-hover:text-[#C5A880] transition-colors leading-snug">
+                    {item.title}
+                  </h3>
                 </motion.div>
               );
             })}
