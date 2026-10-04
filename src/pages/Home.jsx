@@ -44,7 +44,7 @@ import Medavakkam from '../assets/Medavakkam.png';
 import Porur from '../assets/Porur.png';
 
 // Brand & Material Image Assets
-import redBrickImg from '../assets/redbrick.png';
+import redBrickImg from '../assets/Redbrick.png';
 import dalmiaCementImg from '../assets/Dalmia.png';
 import isteelTmtImg from '../assets/Steel.png';
 import somanyTilesImg from '../assets/Sowmi.png';
