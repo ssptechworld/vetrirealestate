@@ -606,65 +606,295 @@ export default function Home({ onOpenInquiryModal }) {
 
         </div>
       </section>
-      {/* AMENITIES SECTION */}
-      <section className="py-20 sm:py-28 bg-[#FAF8F5] text-[#121417]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
+      {/* AMENITIES SECTION - ARCHITECTURAL AMENITIES GALLERY */}
+      <section className="relative py-24 sm:py-32 bg-[#FAF8F5] text-[#121417] overflow-hidden">
+        {/* Subtle Architectural Blueprint & Watermark Background Elements */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden select-none">
+          {/* Giant Oversized Watermark Word */}
+          <div className="absolute top-12 right-2 sm:right-12 text-[15vw] font-serif font-black text-[#121417]/[0.016] tracking-tighter leading-none select-none pointer-events-none">
+            AMENITIES
+          </div>
+
+          {/* Blueprint Fine Measurement Grid Lines */}
+          <svg className="absolute inset-0 w-full h-full opacity-[0.035]" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern id="amenities-arch-grid" width="80" height="80" patternUnits="userSpaceOnUse">
+                <path d="M 80 0 L 0 0 0 80" fill="none" stroke="#121417" strokeWidth="0.75" />
+                <circle cx="80" cy="0" r="1.5" fill="#C5A880" />
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#amenities-arch-grid)" />
+          </svg>
+
+          {/* Large Architectural Drafting Arcs & Geometry */}
+          <div className="absolute -top-36 -left-36 w-[600px] h-[600px] rounded-full border border-[#C5A880]/15 pointer-events-none" />
+          <div className="absolute -top-16 -left-16 w-[440px] h-[440px] rounded-full border border-dashed border-[#C5A880]/20 pointer-events-none" />
+          <div className="absolute top-1/2 -right-48 w-[680px] h-[680px] rounded-full border border-[#C5A880]/12 pointer-events-none" />
+          <div className="absolute bottom-10 left-1/4 w-[480px] h-[480px] rounded-full border border-dashed border-[#121417]/[0.03] pointer-events-none" />
+
+          {/* Ambient Warm Atmosphere Orbs */}
+          <div className="absolute top-1/4 left-10 w-96 h-96 bg-[#C5A880]/[0.03] rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-1/4 right-10 w-[450px] h-[450px] bg-[#C5A880]/[0.025] rounded-full blur-3xl pointer-events-none" />
+        </div>
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+          {/* Editorial Section Header */}
           <motion.div
             variants={fadeUp}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-50px" }}
-            className="text-center max-w-3xl mx-auto mb-16 space-y-3"
+            className="relative pb-10 sm:pb-14 mb-12 sm:mb-16 border-b border-stone-200/80"
           >
-            <span className="text-xs uppercase tracking-[0.25em] text-[#C5A880] font-bold block">
-              CURATED COMFORTS & CONVENIENCE
-            </span>
-            <h2 className="font-serif text-3xl sm:text-5xl font-bold tracking-tight text-[#121417]">
-              AMENITIES
-            </h2>
-            <p className="text-stone-600 text-xs sm:text-sm font-light max-w-xl mx-auto">
-              Thoughtfully planned features and modern conveniences designed to elevate everyday living.
-            </p>
+            {/* Architectural Technical Badge */}
+            <div className="hidden sm:flex absolute -top-5 right-0 items-center gap-2.5 text-[10px] tracking-[0.25em] text-[#C5A880] font-mono uppercase opacity-80">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#C5A880]" />
+              <span>REF // ARCH-SPEC-15</span>
+              <span className="w-8 h-[1px] bg-[#C5A880]/40" />
+              <span>ELEVATED LIVING</span>
+            </div>
+
+            <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8">
+              {/* Left Column: Architectural Tag & Title */}
+              <div className="space-y-4 max-w-2xl text-center lg:text-left">
+                <div className="inline-flex items-center gap-3 justify-center lg:justify-start">
+                  <span className="w-10 h-[1.5px] bg-[#C5A880]" />
+                  <span className="text-[11px] sm:text-xs uppercase tracking-[0.28em] text-[#C5A880] font-bold block">
+                    CURATED COMFORTS & CONVENIENCE
+                  </span>
+                  <span className="w-1.5 h-1.5 rounded-full border border-[#C5A880]/60 hidden sm:inline-block" />
+                </div>
+
+                <div className="relative">
+                  <h2 className="font-serif text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-[#121417] leading-none">
+                    AMENITIES
+                  </h2>
+                  <span className="block mt-2.5 font-mono text-[10px] tracking-[0.3em] uppercase text-stone-500">
+                    MASTERPLAN ARCHITECTURAL SPECIFICATIONS & COMMON LIVING SPACES
+                  </span>
+                </div>
+              </div>
+
+              {/* Right Column: Editorial Description & Living Index */}
+              <div className="max-w-md text-center lg:text-right space-y-3.5 mx-auto lg:mx-0">
+                <p className="text-stone-600 text-xs sm:text-sm font-light leading-relaxed">
+                  Thoughtfully planned features and modern conveniences designed to elevate everyday living.
+                </p>
+
+                <div className="flex items-center justify-center lg:justify-end gap-3 pt-1">
+                  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-stone-200/90 shadow-2xs">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#C5A880] animate-pulse" />
+                    <span className="text-[10px] uppercase tracking-[0.22em] text-[#C5A880] font-bold">
+                      15 Curated Features
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Drafting Hairline Marker at Bottom */}
+            <div className="absolute -bottom-[1px] left-0 right-0 flex justify-between pointer-events-none">
+              <div className="w-3 h-[3px] bg-[#C5A880]" />
+              <div className="w-2 h-[1px] bg-[#C5A880]/60 hidden sm:block" />
+              <div className="w-2 h-[1px] bg-[#C5A880]/60 hidden sm:block" />
+              <div className="w-3 h-[3px] bg-[#C5A880]" />
+            </div>
           </motion.div>
 
-          {/* 15 Amenities Grid */}
+          {/* Asymmetric Architectural Gallery Grid with Unique Background Photography */}
           <motion.div
-            variants={staggerContainer(0.06, 0.1)}
+            variants={staggerContainer(0.05, 0.08)}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-50px" }}
-            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-5 lg:gap-6"
+            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6"
           >
-            {amenities.map((item, idx) => {
-              const Icon = item.icon;
-              return (
-                <motion.div
-                  key={idx}
-                  variants={fadeUp}
-                  whileHover={{ y: -6 }}
-                  className="group bg-white p-6 rounded-[24px] sm:rounded-[28px] border border-stone-200/80 hover:border-[#C5A880]/60 shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col items-center text-center justify-start min-h-[190px] relative overflow-hidden"
-                >
-                  {/* Subtle Gold Hover Glow */}
-                  <div className="absolute -top-10 -right-10 w-20 h-20 bg-[#C5A880]/10 rounded-full blur-xl group-hover:bg-[#C5A880]/25 transition-all duration-500 pointer-events-none" />
+            {(() => {
+              // 15 Unique High-Quality Verified Architectural / Lifestyle Photography Assets
+              const AMENITY_IMAGES = [
+                // 0: Covered Car Parking (Featured Signature Hero)
+                "https://images.unsplash.com/photo-1590674899484-d5640e854abe?auto=format&fit=crop&w=1200&q=80",
+                // 1: Biometric Access
+                "https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&w=800&q=80",
+                // 2: 24×7 CCTV Surveillance
+                "https://images.unsplash.com/photo-1557597774-9d273605dfa9?auto=format&fit=crop&w=800&q=80",
+                // 3: Solar Power Provision for Common Areas
+                "https://images.unsplash.com/photo-1613665813446-82a78c468a1d?auto=format&fit=crop&w=800&q=80",
+                // 4: Spacious Floor Lobby on Each Level for Comfortable Circulation
+                "https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=800&q=80",
+                // 5: Timer Controlled Lighting Throughout All Common Spaces
+                "https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?auto=format&fit=crop&w=800&q=80",
+                // 6: Utility Space at Terrace
+                "https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=800&q=80",
+                // 7: Online Delivery Drop Box
+                "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80",
+                // 8: Automatic Pump Cut-Off for Efficient Water Management
+                "https://images.unsplash.com/photo-1584467735871-8e85353a8413?auto=format&fit=crop&w=800&q=80",
+                // 9: Mini-Urban Farm / Edible Garden Beds
+                "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=800&q=80",
+                // 10: Interactive Kids' Zone with Sensor Play
+                "https://images.unsplash.com/photo-1500990702037-7620ccb6a60a?auto=format&fit=crop&w=800&q=80",
+                // 11: Yoga / Meditation Deck
+                "https://images.unsplash.com/photo-1545205597-3d9d02c29597?auto=format&fit=crop&w=800&q=80",
+                // 12: Lift Till Terrace
+                "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=800&q=80",
+                // 13: EV Charging Provision
+                "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?auto=format&fit=crop&w=800&q=80",
+                // 14: Fully Automated Main Gate
+                "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80"
+              ];
 
-                  {/* Circular Icon Area */}
-                  <div className="w-13 h-13 rounded-full bg-[#FAF8F5] border border-[#C5A880]/40 text-[#C5A880] flex items-center justify-center group-hover:bg-[#121417] group-hover:text-white group-hover:border-[#121417] transition-all duration-300 mb-3 shrink-0 shadow-xs">
-                    <Icon className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
-                  </div>
+              return amenities.map((item, idx) => {
+                const Icon = item.icon;
+                const isHero = idx === 0;
+                const isWideFeature = idx === 9 || idx === 14;
+                const bgImage = AMENITY_IMAGES[idx] || AMENITY_IMAGES[0];
 
-                  {/* Amenity Number */}
-                  <span className="text-[10px] font-bold tracking-[0.2em] text-[#C5A880] uppercase block mb-1.5">
-                    {String(idx + 1).padStart(2, '0')}
-                  </span>
+                return (
+                  <motion.div
+                    key={idx}
+                    variants={fadeUp}
+                    whileHover={{ y: -7 }}
+                    className={`group relative rounded-[28px] sm:rounded-[36px] border border-white/20 hover:border-[#C5A880]/80 shadow-md hover:shadow-2xl hover:shadow-[#C5A880]/20 transition-all duration-500 flex flex-col justify-between overflow-hidden bg-[#121417] ${
+                      isHero
+                        ? "sm:col-span-2 lg:col-span-2 lg:row-span-2 p-7 sm:p-9 min-h-[380px] sm:min-h-[460px]"
+                        : isWideFeature
+                        ? "sm:col-span-2 lg:col-span-2 p-6 sm:p-7 min-h-[220px] sm:min-h-[240px]"
+                        : "col-span-1 p-6 sm:p-7 min-h-[220px] sm:min-h-[240px]"
+                    }`}
+                  >
+                    {/* Unique Full-Bleed Architectural Photography Background */}
+                    <div className="absolute inset-0 z-0 overflow-hidden">
+                      <img
+                        src={bgImage}
+                        alt={item.title}
+                        loading={isHero ? "eager" : "lazy"}
+                        className="w-full h-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-108 group-hover:-translate-y-1 brightness-95"
+                      />
 
-                  {/* Amenity Title */}
-                  <h3 className="font-serif text-sm sm:text-[15px] font-bold text-[#121417] group-hover:text-[#C5A880] transition-colors leading-snug">
-                    {item.title}
-                  </h3>
-                </motion.div>
-              );
-            })}
+                      {/* Elegant Layered Multi-Stop Dark Gradient Overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#121417] via-[#121417]/75 to-[#121417]/35 transition-opacity duration-500 group-hover:opacity-90" />
+
+                      {/* Subtle Ambient Gold Hue Around Top Corner */}
+                      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(197,168,128,0.22),transparent_70%)] pointer-events-none" />
+                    </div>
+
+                    {/* Subtle Cinematic Light Sweep across card on Hover */}
+                    <div className="absolute -inset-full group-hover:translate-x-full transition-transform duration-1000 ease-out pointer-events-none bg-gradient-to-r from-transparent via-[#C5A880]/[0.12] to-transparent -skew-x-12 z-[2]" />
+
+                    {/* Corner Accent Glow */}
+                    <div className="absolute -top-12 -right-12 w-28 h-28 bg-[#C5A880]/15 rounded-full blur-2xl group-hover:bg-[#C5A880]/30 transition-all duration-500 pointer-events-none z-[1]" />
+
+                    {/* Blueprint Architectural Drafting Arcs & Rings */}
+                    <div className="absolute -bottom-8 -right-8 w-24 h-24 rounded-full border border-[#C5A880]/20 group-hover:border-[#C5A880]/50 transition-all duration-700 ease-out pointer-events-none group-hover:scale-125 z-[1]" />
+                    <div className="absolute -bottom-14 -right-14 w-36 h-36 rounded-full border border-dashed border-[#C5A880]/15 group-hover:border-[#C5A880]/35 transition-all duration-700 ease-out pointer-events-none group-hover:scale-115 z-[1]" />
+
+                    {/* Corner Technical Drafting Ticks */}
+                    <div className="absolute top-3.5 left-3.5 w-2.5 h-2.5 border-t border-l border-[#C5A880]/60 pointer-events-none z-10" />
+                    <div className="absolute right-3.5 top-1/2 -translate-y-1/2 flex flex-col gap-1 items-center pointer-events-none opacity-40 group-hover:opacity-90 transition-opacity z-10">
+                      <span className="w-1.5 h-[1px] bg-[#C5A880]" />
+                      <span className="w-3 h-[1px] bg-[#C5A880]" />
+                      <span className="w-1.5 h-[1px] bg-[#C5A880]" />
+                    </div>
+
+                    {/* Large Subtle Background Watermark Number */}
+                    <span
+                      className={`absolute right-4 font-serif font-bold text-white/[0.06] group-hover:text-[#C5A880]/[0.18] select-none pointer-events-none transition-all duration-700 ease-out group-hover:scale-105 group-hover:-translate-y-1 z-[1] ${
+                        isHero
+                          ? "bottom-4 text-8xl sm:text-9xl"
+                          : "bottom-2 text-6xl sm:text-7xl"
+                      }`}
+                    >
+                      {String(idx + 1).padStart(2, '0')}
+                    </span>
+
+                    {/* Top Bar: Number & Icon */}
+                    <div className="relative z-10 flex items-start justify-between">
+                      <div>
+                        <span className="font-mono text-[11px] sm:text-xs font-bold tracking-[0.25em] text-[#C5A880] uppercase block drop-shadow-xs">
+                          /{String(idx + 1).padStart(2, '0')}
+                        </span>
+                        {isHero && (
+                          <span className="inline-flex items-center gap-1.5 mt-2 px-2.5 py-0.5 rounded-full bg-[#121417]/80 backdrop-blur-md border border-[#C5A880]/40 text-[#C5A880] text-[9px] font-bold tracking-[0.2em] uppercase shadow-xs">
+                            <span className="w-1 h-1 rounded-full bg-[#C5A880] animate-pulse" />
+                            SIGNATURE RESIDENTIAL INFRASTRUCTURE
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Icon Container with Translucent Glass & Animated Orbit Arc */}
+                      <div className="relative shrink-0">
+                        {/* Architectural orbit rings on hover */}
+                        <div className="absolute -inset-1.5 rounded-full border border-dashed border-[#C5A880]/0 group-hover:border-[#C5A880]/60 transition-all duration-700 group-hover:rotate-90 pointer-events-none" />
+                        <div className="absolute -inset-0.5 rounded-full border-t border-r border-transparent group-hover:border-[#C5A880] transition-all duration-500 pointer-events-none" />
+
+                        <div
+                          className={`rounded-2xl group-hover:rounded-full bg-[#121417]/70 backdrop-blur-md border border-[#C5A880]/45 text-[#C5A880] group-hover:bg-[#121417] group-hover:text-white group-hover:border-[#C5A880] flex items-center justify-center transition-all duration-500 shadow-lg ${
+                            isHero
+                              ? "w-14 h-14 sm:w-16 sm:h-16"
+                              : "w-11 h-11 sm:w-12 sm:h-12"
+                          }`}
+                        >
+                          <Icon
+                            className={`transition-transform duration-500 group-hover:scale-110 ${
+                              isHero ? "w-7 h-7" : "w-5 h-5"
+                            }`}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Bottom Content Area */}
+                    <div className="relative z-10 mt-6 space-y-2">
+                      {/* Gold Accent Line that expands smoothly on hover */}
+                      <div
+                        className={`h-[2px] bg-[#C5A880] transition-all duration-500 ease-out rounded-full ${
+                          isHero
+                            ? "w-10 group-hover:w-20"
+                            : "w-6 group-hover:w-12"
+                        }`}
+                      />
+
+                      {/* Small Uppercase Curated Label */}
+                      <div className="flex items-center gap-1.5 pt-0.5">
+                        <span className="w-1 h-1 rounded-full bg-[#C5A880]" />
+                        <span className="font-mono text-[9px] uppercase tracking-[0.24em] text-[#C5A880] font-semibold">
+                          {isHero ? "SIGNATURE AMENITY" : "CURATED AMENITY"}
+                        </span>
+                      </div>
+
+                      {/* Title in White with High Contrast */}
+                      <h3
+                        className={`font-serif font-bold text-white group-hover:text-[#C5A880] transition-colors duration-300 leading-snug drop-shadow-xs ${
+                          isHero
+                            ? "text-xl sm:text-2xl lg:text-3xl max-w-md"
+                            : "text-sm sm:text-[15px]"
+                        }`}
+                      >
+                        {item.title}
+                      </h3>
+
+                      {/* Extended Description for Hero & Wide Cards */}
+                      {isHero && (
+                        <p className="text-stone-300 text-xs sm:text-sm font-light leading-relaxed max-w-lg pt-1 drop-shadow-xs">
+                          Dedicated sheltered vehicle bays with generous circulation turning radius, reinforced anti-skid paving, and EV conduit provisions designed for seamless daily convenience.
+                        </p>
+                      )}
+
+                      {isWideFeature && (
+                        <p className="text-stone-300 text-xs font-light leading-relaxed max-w-md hidden sm:block drop-shadow-xs">
+                          {idx === 9
+                            ? "Dedicated green cultivation beds designed for natural wellness and community gardening."
+                            : "State-of-the-art entry automation engineered with RFID sensors and secure remote operation."}
+                        </p>
+                      )}
+                    </div>
+                  </motion.div>
+                );
+              });
+            })()}
           </motion.div>
 
         </div>
