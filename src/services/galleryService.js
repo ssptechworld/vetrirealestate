@@ -1,14 +1,11 @@
-const getBaseUrl = () => {
-  if (import.meta.env.VITE_API_BASE_URL) {
-    return import.meta.env.VITE_API_BASE_URL;
-  }
-  if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
-    return 'http://localhost:5000';
-  }
-  return 'https://vetrirealestatebackend.onrender.com';
-};
+const API_URL = (
+  (typeof import.meta !== 'undefined' && import.meta.env && (import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL)) ||
+  'https://vetrirealestatebackend.onrender.com'
+).replace(/\/$/, '');
 
-const API_BASE_URL = getBaseUrl().replace(/\/$/, '');
+const API_BASE_URL = API_URL;
+
+export { API_URL, API_BASE_URL };
 
 export const getMediaUrl = (mediaPath) => {
   if (!mediaPath) return '';
