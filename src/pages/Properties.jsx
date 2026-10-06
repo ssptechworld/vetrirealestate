@@ -31,8 +31,8 @@ export default function Properties() {
       } catch (err) {
         console.error("Failed to fetch database projects in Properties page:", err);
         if (isMounted) {
-          setError("Failed to connect to property database. Please verify the backend API server is running.");
           setAllProperties([]);
+          setError("Unable to load properties from the database.");
         }
       } finally {
         if (isMounted) setLoading(false);

@@ -1,4 +1,14 @@
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'https://vetrirealestatebackend.onrender.com').replace(/\/$/, '');
+const getBaseUrl = () => {
+  if (import.meta.env.VITE_API_BASE_URL) {
+    return import.meta.env.VITE_API_BASE_URL;
+  }
+  if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+    return 'http://localhost:5000';
+  }
+  return 'https://vetrirealestatebackend.onrender.com';
+};
+
+const API_BASE_URL = getBaseUrl().replace(/\/$/, '');
 
 export const getImageUrl = (imagePath) => {
   if (!imagePath) return '';
@@ -28,6 +38,20 @@ export const formatProjectForCarousel = (proj) => {
     }
   }
 
+  const allImages = [];
+  if (Array.isArray(proj.images) && proj.images.length > 0) {
+    proj.images.forEach((img) => {
+      const url = getImageUrl(img);
+      if (url && !allImages.includes(url)) allImages.push(url);
+    });
+  }
+  const hero = getImageUrl(proj.image);
+  if (hero && !allImages.includes(hero)) {
+    allImages.unshift(hero);
+  }
+
+  const brochure = proj.brochureUrl ? getImageUrl(proj.brochureUrl) : '';
+
   return {
     id: proj._id || proj.id,
     title: proj.name || 'Untitled Project',
@@ -37,8 +61,10 @@ export const formatProjectForCarousel = (proj) => {
     formattedPrice,
     price: numPrice > 0 ? numPrice : 50000000,
     propertyType: proj.type || 'Residence',
-    badge: proj.featured ? 'Featured' : (proj.status === 'ongoing' ? 'Ongoing' : 'Completed'),
-    heroImage: getImageUrl(proj.image),
+    badge: proj.featured ? 'Featured' : (proj.status?.toLowerCase() === 'completed' ? 'Completed' : 'Ongoing'),
+    heroImage: hero || allImages[0] || '',
+    gallery: allImages.length > 0 ? allImages : (hero ? [hero] : []),
+    brochureUrl: brochure,
     bedrooms: proj.bedrooms || '3 BHK',
     bathrooms: 3,
     sqft: typeof proj.area === 'number' ? proj.area : (parseInt(proj.area) || 1850),

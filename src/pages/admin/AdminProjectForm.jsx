@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Upload, Image as ImageIcon, Save, AlertCircle, RefreshCw } from 'lucide-react';
+import { ArrowLeft, Upload, Image as ImageIcon, Save, AlertCircle, RefreshCw, FileText, X, Check } from 'lucide-react';
 import { createProject, updateProject, getProjectById, getImageUrl } from '../../services/projectService';
 
 export default function AdminProjectForm({ isEdit = false }) {
@@ -13,16 +13,20 @@ export default function AdminProjectForm({ isEdit = false }) {
     type: 'Apartment',
     status: 'ongoing',
     price: '',
-    description: '',
     bedrooms: '3 BHK',
     area: '1850 Sq.Ft',
     completionDate: '',
     featured: false
   });
 
-  const [imageFile, setImageFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
-  const [existingImage, setExistingImage] = useState('');
+  // Multiple project images state
+  const [newImageFiles, setNewImageFiles] = useState([]);
+  const [newImagePreviews, setNewImagePreviews] = useState([]);
+  const [existingImagesList, setExistingImagesList] = useState([]);
+
+  // Project brochure (PDF) state
+  const [brochureFile, setBrochureFile] = useState(null);
+  const [existingBrochureUrl, setExistingBrochureUrl] = useState('');
 
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(isEdit);
@@ -40,14 +44,26 @@ export default function AdminProjectForm({ isEdit = false }) {
             type: project.type || 'Apartment',
             status: project.status || 'ongoing',
             price: project.price || '',
-            description: project.description || '',
             bedrooms: project.bedrooms || '3 BHK',
             area: project.area || '1850 Sq.Ft',
             completionDate: project.completionDate || '',
             featured: Boolean(project.featured)
           });
-          if (project.image) {
-            setExistingImage(getImageUrl(project.image));
+
+          // Collect existing images
+          const allExisting = [];
+          if (Array.isArray(project.images) && project.images.length > 0) {
+            project.images.forEach((img) => {
+              const u = getImageUrl(img);
+              if (u && !allExisting.includes(u)) allExisting.push(u);
+            });
+          } else if (project.image) {
+            allExisting.push(getImageUrl(project.image));
+          }
+          setExistingImagesList(allExisting);
+
+          if (project.brochureUrl) {
+            setExistingBrochureUrl(getImageUrl(project.brochureUrl));
           }
         } catch (err) {
           console.error(err);
@@ -68,26 +84,57 @@ export default function AdminProjectForm({ isEdit = false }) {
     }));
   };
 
-  const handleImageChange = (e) => {
+  const handleMultipleImagesChange = (e) => {
+    const files = Array.from(e.target.files);
+    if (!files.length) return;
+
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    const validFiles = [];
+    const newPreviews = [];
+
+    for (const file of files) {
+      if (!validTypes.includes(file.type)) {
+        setError(`"${file.name}" is not a valid format. Please upload JPG, PNG, or WEBP.`);
+        return;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        setError(`"${file.name}" exceeds 10MB limit.`);
+        return;
+      }
+      validFiles.push(file);
+      newPreviews.push(URL.createObjectURL(file));
+    }
+
+    setError('');
+    setNewImageFiles((prev) => [...prev, ...validFiles]);
+    setNewImagePreviews((prev) => [...prev, ...newPreviews]);
+  };
+
+  const removeNewImage = (index) => {
+    setNewImageFiles((prev) => prev.filter((_, i) => i !== index));
+    setNewImagePreviews((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const removeExistingImage = (index) => {
+    setExistingImagesList((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleBrochureChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Validate file type
-    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-    if (!validTypes.includes(file.type)) {
-      setError('Invalid file format. Please upload a JPG, JPEG, PNG, or WEBP image.');
+    if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+      setError('Invalid file format. Please upload a PDF file for the brochure.');
       return;
     }
 
-    // Validate file size (10MB limit)
-    if (file.size > 10 * 1024 * 1024) {
-      setError('File size is too large. Maximum size is 10MB.');
+    if (file.size > 25 * 1024 * 1024) {
+      setError('Brochure file size exceeds 25MB limit.');
       return;
     }
 
     setError('');
-    setImageFile(file);
-    setImagePreview(URL.createObjectURL(file));
+    setBrochureFile(file);
   };
 
   const handleSubmit = async (e) => {
@@ -106,8 +153,12 @@ export default function AdminProjectForm({ isEdit = false }) {
       setError('Price is required.');
       return;
     }
-    if (!isEdit && !imageFile) {
-      setError('Please select a project image to upload.');
+    if (!isEdit && newImageFiles.length === 0) {
+      setError('Please select at least one project image to upload.');
+      return;
+    }
+    if (isEdit && existingImagesList.length === 0 && newImageFiles.length === 0) {
+      setError('The project must have at least one image.');
       return;
     }
 
@@ -119,14 +170,24 @@ export default function AdminProjectForm({ isEdit = false }) {
       data.append('type', formData.type);
       data.append('status', formData.status);
       data.append('price', formData.price);
-      data.append('description', formData.description);
       data.append('bedrooms', formData.bedrooms);
       data.append('area', formData.area);
       data.append('completionDate', formData.completionDate);
       data.append('featured', formData.featured);
 
-      if (imageFile) {
-        data.append('image', imageFile);
+      // Append retained existing images list
+      data.append('existingImages', JSON.stringify(existingImagesList));
+
+      // Append new images
+      if (newImageFiles.length > 0) {
+        newImageFiles.forEach((file) => {
+          data.append('images', file);
+        });
+      }
+
+      // Append brochure PDF if selected
+      if (brochureFile) {
+        data.append('brochure', brochureFile);
       }
 
       if (isEdit) {
@@ -187,54 +248,82 @@ export default function AdminProjectForm({ isEdit = false }) {
         {/* Form Container */}
         <form onSubmit={handleSubmit} className="bg-white border border-stone-200 rounded-xs shadow-sm p-6 sm:p-8 space-y-8">
           
-          {/* Section 1: Image Upload */}
+          {/* Section 1: Multiple Project Images */}
           <div className="space-y-4">
-            <h3 className="font-serif text-lg font-bold text-[#121417] border-b border-stone-100 pb-2">
-              Project Image Showcase
-            </h3>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-              
-              {/* Image Preview Box */}
-              <div className="relative aspect-[16/10] bg-stone-100 border border-stone-200 rounded-xs overflow-hidden flex items-center justify-center">
-                {imagePreview ? (
-                  <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
-                ) : existingImage ? (
-                  <img src={existingImage} alt="Current" className="w-full h-full object-cover" />
-                ) : (
-                  <div className="text-center p-6 text-zinc-400">
-                    <ImageIcon className="w-10 h-10 mx-auto mb-2 opacity-50" />
-                    <span className="text-xs block">No image selected</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Upload Input */}
-              <div className="space-y-3">
-                <label className="block text-xs font-bold uppercase tracking-wider text-zinc-700">
-                  Upload Image file (JPG, PNG, WEBP)
-                </label>
-                
-                <label className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-stone-300 hover:border-[#C5A880] rounded-xs cursor-pointer bg-stone-50/50 hover:bg-stone-50 transition-all text-center">
-                  <Upload className="w-6 h-6 text-[#C5A880] mb-2" />
-                  <span className="text-xs font-semibold text-zinc-700">Click to choose image file</span>
-                  <span className="text-[11px] text-zinc-400 mt-1">Recommended size: 1920x1080 (Max 10MB)</span>
-                  <input
-                    type="file"
-                    accept="image/jpeg,image/png,image/webp,image/jpg"
-                    onChange={handleImageChange}
-                    className="hidden"
-                  />
-                </label>
-
-                {imageFile && (
-                  <p className="text-xs text-emerald-700 font-medium truncate">
-                    Selected file: {imageFile.name}
-                  </p>
-                )}
-              </div>
-
+            <div className="flex items-center justify-between border-b border-stone-100 pb-2">
+              <h3 className="font-serif text-lg font-bold text-[#121417]">
+                Project Images
+              </h3>
+              <span className="text-xs text-zinc-500 font-medium">
+                {existingImagesList.length + newImageFiles.length} image{existingImagesList.length + newImageFiles.length !== 1 ? 's' : ''} total
+              </span>
             </div>
+
+            {/* Upload Zone */}
+            <div className="space-y-3">
+              <label className="block text-xs font-bold uppercase tracking-wider text-zinc-700">
+                Upload Project Images (Select multiple files)
+              </label>
+              
+              <label className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-stone-300 hover:border-[#C5A880] rounded-xs cursor-pointer bg-stone-50/50 hover:bg-stone-50 transition-all text-center">
+                <Upload className="w-6 h-6 text-[#C5A880] mb-2" />
+                <span className="text-xs font-semibold text-zinc-700">Click to choose one or more images</span>
+                <span className="text-[11px] text-zinc-400 mt-1">Recommended: 1920x1080 (JPG, PNG, WEBP — Max 10MB per image)</span>
+                <input
+                  type="file"
+                  multiple
+                  accept="image/jpeg,image/png,image/webp,image/jpg"
+                  onChange={handleMultipleImagesChange}
+                  className="hidden"
+                />
+              </label>
+            </div>
+
+            {/* Images Preview Grid */}
+            {(existingImagesList.length > 0 || newImagePreviews.length > 0) && (
+              <div className="pt-2">
+                <span className="text-[11px] uppercase tracking-wider font-bold text-zinc-500 block mb-2">
+                  Uploaded & Selected Images
+                </span>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                  {/* Existing Saved Images */}
+                  {existingImagesList.map((url, idx) => (
+                    <div key={`existing-${idx}`} className="relative aspect-[16/10] bg-stone-100 border border-stone-200 rounded-xs overflow-hidden group shadow-xs">
+                      <img src={url} alt={`Saved ${idx + 1}`} className="w-full h-full object-cover" />
+                      <span className="absolute bottom-1.5 left-1.5 px-2 py-0.5 bg-[#0E1013]/80 text-[#C5A880] text-[9px] font-bold uppercase rounded-xs">
+                        Saved
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => removeExistingImage(idx)}
+                        className="absolute top-1.5 right-1.5 p-1 bg-red-600/90 text-white rounded-xs opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-700 cursor-pointer"
+                        title="Remove image"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ))}
+
+                  {/* Newly Selected Images */}
+                  {newImagePreviews.map((url, idx) => (
+                    <div key={`new-${idx}`} className="relative aspect-[16/10] bg-stone-100 border-2 border-dashed border-[#C5A880] rounded-xs overflow-hidden group shadow-xs">
+                      <img src={url} alt={`New ${idx + 1}`} className="w-full h-full object-cover" />
+                      <span className="absolute bottom-1.5 left-1.5 px-2 py-0.5 bg-emerald-700 text-white text-[9px] font-bold uppercase rounded-xs">
+                        New
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => removeNewImage(idx)}
+                        className="absolute top-1.5 right-1.5 p-1 bg-red-600/90 text-white rounded-xs opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-700 cursor-pointer"
+                        title="Remove image"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Section 2: Core Details */}
@@ -261,7 +350,7 @@ export default function AdminProjectForm({ isEdit = false }) {
                 />
               </div>
 
-              {/* Location */}
+              {/* Location (Replaces Short Description & provides exact project location) */}
               <div className="space-y-1.5">
                 <label className="block text-xs font-bold uppercase tracking-wider text-zinc-700">
                   Location *
@@ -271,7 +360,7 @@ export default function AdminProjectForm({ isEdit = false }) {
                   name="location"
                   value={formData.location}
                   onChange={handleChange}
-                  placeholder="e.g. ECR, Chennai"
+                  placeholder="e.g. Medavakkam, Chennai"
                   className="w-full px-4 py-2.5 bg-stone-50 border border-stone-200 focus:border-[#C5A880] focus:bg-white text-sm rounded-xs transition-colors outline-none"
                   required
                 />
@@ -375,21 +464,6 @@ export default function AdminProjectForm({ isEdit = false }) {
 
             </div>
 
-            {/* Description */}
-            <div className="space-y-1.5">
-              <label className="block text-xs font-bold uppercase tracking-wider text-zinc-700">
-                Short Description
-              </label>
-              <textarea
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                rows={4}
-                placeholder="Enter a brief overview of the project highlights, architectural features, and location benefits..."
-                className="w-full px-4 py-2.5 bg-stone-50 border border-stone-200 focus:border-[#C5A880] focus:bg-white text-sm rounded-xs transition-colors outline-none resize-none"
-              />
-            </div>
-
             {/* Featured Checkbox */}
             <div className="flex items-center gap-3 pt-2">
               <input
@@ -405,6 +479,72 @@ export default function AdminProjectForm({ isEdit = false }) {
               </label>
             </div>
 
+          </div>
+
+          {/* Section 3: Project Brochure (PDF) */}
+          <div className="space-y-4 border-t border-stone-100 pt-6">
+            <h3 className="font-serif text-lg font-bold text-[#121417] border-b border-stone-100 pb-2">
+              Project Brochure (PDF)
+            </h3>
+
+            <div className="space-y-3">
+              <label className="block text-xs font-bold uppercase tracking-wider text-zinc-700">
+                Upload Brochure (PDF Only)
+              </label>
+
+              {/* Show Existing Brochure info if present */}
+              {existingBrochureUrl && !brochureFile && (
+                <div className="p-3 bg-stone-50 border border-stone-200 rounded-xs flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <FileText className="w-5 h-5 text-[#C5A880]" />
+                    <div>
+                      <span className="text-xs font-semibold text-zinc-800 block">Current Brochure is Uploaded</span>
+                      <span className="text-[11px] text-zinc-500">Select a new PDF below if you want to replace it</span>
+                    </div>
+                  </div>
+                  <a
+                    href={existingBrochureUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-3 py-1.5 bg-white border border-stone-300 text-xs font-semibold text-zinc-700 rounded-xs hover:border-[#C5A880] transition-colors"
+                  >
+                    View PDF
+                  </a>
+                </div>
+              )}
+
+              <label className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-stone-300 hover:border-[#C5A880] rounded-xs cursor-pointer bg-stone-50/50 hover:bg-stone-50 transition-all text-center">
+                <FileText className="w-6 h-6 text-[#C5A880] mb-2" />
+                <span className="text-xs font-semibold text-zinc-700">
+                  {existingBrochureUrl ? 'Click to replace existing brochure (PDF)' : 'Click to choose brochure (PDF)'}
+                </span>
+                <span className="text-[11px] text-zinc-400 mt-1">Accepts PDF files only (Max 25MB)</span>
+                <input
+                  type="file"
+                  accept="application/pdf,.pdf"
+                  onChange={handleBrochureChange}
+                  className="hidden"
+                />
+              </label>
+
+              {brochureFile && (
+                <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xs flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-emerald-600" />
+                    <span className="text-xs text-emerald-800 font-semibold truncate">
+                      Selected: {brochureFile.name} ({(brochureFile.size / (1024 * 1024)).toFixed(2)} MB)
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setBrochureFile(null)}
+                    className="text-xs text-red-600 hover:text-red-800 font-bold"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Form Actions */}

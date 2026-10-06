@@ -1,16 +1,31 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { MapPin, Heart, Share2, Calendar, Phone, MessageSquare, ArrowLeft, CheckCircle2, ShieldCheck, ChevronRight } from 'lucide-react';
+import {
+  MapPin,
+  Heart,
+  Share2,
+  Calendar,
+  MessageSquare,
+  ArrowLeft,
+  CheckCircle2,
+  ChevronRight,
+  FileText,
+  ExternalLink,
+  Volume2,
+  VolumeX,
+  Play,
+  Pause,
+  HardHat,
+  Sparkles
+} from 'lucide-react';
 import PropertyGallery from '../components/PropertyGallery';
 import PropertySpecs from '../components/PropertySpecs';
 import AmenitiesList from '../components/AmenitiesList';
 import PropertyCard from '../components/PropertyCard';
 import { PROPERTIES_DATA } from '../data/properties';
-import { AGENTS_DATA } from '../data/agents';
 import { useFavorites } from '../context/FavoritesContext';
-import { fadeUp } from '../utils/animations';
 import { getProjectById, formatProjectForCarousel } from '../services/projectService';
+import buildingVideo from '../assets/Building.mp4';
 
 export default function PropertyDetails({ onOpenInquiryModal }) {
   const { id } = useParams();
@@ -18,16 +33,32 @@ export default function PropertyDetails({ onOpenInquiryModal }) {
   const { isFavorite, toggleFavorite } = useFavorites();
 
   const [copied, setCopied] = useState(false);
-  const [activeTab, setActiveTab] = useState('overview');
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  // Build / Construction Video Controls State
+  const [isBuildVideoMuted, setIsBuildVideoMuted] = useState(true);
+  const [isBuildVideoPlaying, setIsBuildVideoPlaying] = useState(true);
+  const buildVideoRef = useRef(null);
+
+  const togglePlayPause = () => {
+    if (buildVideoRef.current) {
+      if (buildVideoRef.current.paused) {
+        buildVideoRef.current.play();
+        setIsBuildVideoPlaying(true);
+      } else {
+        buildVideoRef.current.pause();
+        setIsBuildVideoPlaying(false);
+      }
+    }
+  };
 
   useEffect(() => {
     let isMounted = true;
     const fetchPropertyDetails = async () => {
       setLoading(true);
-      // 1. Search in static data
-      const staticProp = PROPERTIES_DATA.find((p) => p.id === id);
+      // 1. Search in static data by id or slug
+      const staticProp = PROPERTIES_DATA.find((p) => p.id === id || p.slug === id);
       if (staticProp) {
         if (isMounted) {
           setProperty(staticProp);
@@ -39,9 +70,13 @@ export default function PropertyDetails({ onOpenInquiryModal }) {
       // 2. Fetch from MongoDB API
       try {
         const apiProj = await getProjectById(id);
-        if (isMounted && apiProj) {
-          const formatted = formatProjectForCarousel(apiProj);
-          setProperty(formatted);
+        if (isMounted) {
+          if (apiProj) {
+            const formatted = formatProjectForCarousel(apiProj);
+            setProperty(formatted || PROPERTIES_DATA[0]);
+          } else {
+            setProperty(PROPERTIES_DATA[0]);
+          }
         }
       } catch (err) {
         console.error('Error fetching project from API:', err);
@@ -68,7 +103,6 @@ export default function PropertyDetails({ onOpenInquiryModal }) {
     );
   }
 
-  const agent = AGENTS_DATA.find((a) => a.id === property.agentId) || AGENTS_DATA[0];
   const favorite = isFavorite(property.id);
 
   const similarProperties = PROPERTIES_DATA.filter(
@@ -81,13 +115,13 @@ export default function PropertyDetails({ onOpenInquiryModal }) {
     setTimeout(() => setCopied(false), 2500);
   };
 
-  const whatsappUrl = `https://wa.me/${agent.whatsapp}?text=${encodeURIComponent(
-    `Hello ${agent.name}, I am inquiring about "${property.title}" listed at ${property.formattedPrice} on Vetri Vel Real Estate.`
+  const whatsappUrl = `https://wa.me/919380005934?text=${encodeURIComponent(
+    `Hello, I am inquiring about "${property.title}" (${property.location || property.areaName}) listed at ${property.formattedPrice} on Vetri Vel Real Estate.`
   )}`;
 
   return (
     <div className="min-h-screen bg-[#FAF8F5]/80 backdrop-blur-xs pt-28 pb-24">
-      
+
       {/* Breadcrumb & Navigation Back Bar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
         <div className="flex items-center justify-between">
@@ -115,11 +149,10 @@ export default function PropertyDetails({ onOpenInquiryModal }) {
 
             <button
               onClick={() => toggleFavorite(property.id)}
-              className={`p-3 rounded-full border transition-colors cursor-pointer shadow-sm ${
-                favorite
+              className={`p-3 rounded-full border transition-colors cursor-pointer shadow-sm ${favorite
                   ? 'bg-rose-500 text-white border-rose-500'
                   : 'bg-white text-zinc-600 border-stone-200 hover:text-rose-500'
-              }`}
+                }`}
               title="Save to favorites"
             >
               <Heart className={`w-4 h-4 ${favorite ? 'fill-current' : ''}`} />
@@ -130,7 +163,7 @@ export default function PropertyDetails({ onOpenInquiryModal }) {
 
       {/* Main Container */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+
         {/* 1. PROPERTY GALLERY SHOWCASE */}
         <div className="mb-10">
           <PropertyGallery gallery={property.gallery && property.gallery.length > 0 ? property.gallery : [property.heroImage]} title={property.title} />
@@ -154,9 +187,23 @@ export default function PropertyDetails({ onOpenInquiryModal }) {
               {property.title}
             </h1>
 
-            <div className="flex items-center gap-2 text-zinc-500 text-sm">
-              <MapPin className="w-4 h-4 text-[#C5A880]" />
-              <span className="font-medium">{property.location}</span>
+            <div className="flex flex-wrap items-center gap-4 text-zinc-500 text-sm">
+              <div className="flex items-center gap-1.5">
+                <MapPin className="w-4 h-4 text-[#C5A880]" />
+                <span className="font-medium text-zinc-700">{property.location || property.areaName}</span>
+              </div>
+
+              {property.brochureUrl && (
+                <a
+                  href={property.brochureUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-[#C5A880] hover:text-[#b5966c] uppercase tracking-wider transition-colors"
+                >
+                  <FileText className="w-4 h-4" />
+                  <span>Download Brochure</span>
+                </a>
+              )}
             </div>
           </div>
 
@@ -173,10 +220,10 @@ export default function PropertyDetails({ onOpenInquiryModal }) {
 
         {/* 3. TWO-COLUMN LAYOUT: CONTENT + STICKY ENQUIRY PANEL */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-          
+
           {/* Main Details Col (2 Columns) */}
           <div className="lg:col-span-2 space-y-10">
-            
+
             {/* Specs Grid */}
             <PropertySpecs property={property} />
 
@@ -186,7 +233,7 @@ export default function PropertyDetails({ onOpenInquiryModal }) {
                 Architectural Overview
               </h3>
               <p className="text-zinc-700 text-sm sm:text-base leading-relaxed whitespace-pre-line font-light">
-                {property.description}
+                {property.description || `Experience refined living at ${property.title}, situated in prime ${property.location || property.areaName}. Crafted with architectural precision, premium materials, and discrete luxury design.`}
               </p>
 
               {/* Highlights Bullet List */}
@@ -205,47 +252,52 @@ export default function PropertyDetails({ onOpenInquiryModal }) {
               )}
             </div>
 
+
+
             {/* Amenities List */}
             <AmenitiesList amenities={property.amenities} />
 
-            {/* Assigned Advisor Section */}
-            <div className="bg-[#0E1013] text-white p-8 sm:p-10 rounded-[36px] border border-[#C5A880]/30 shadow-2xl space-y-8 relative overflow-hidden">
-              <div className="flex items-center gap-2.5 text-[#C5A880]">
-                <ShieldCheck className="w-5 h-5" />
-                <span className="text-xs uppercase tracking-widest font-semibold">Assigned Private Advisory Partner</span>
-              </div>
-
-              <div className="flex flex-col sm:flex-row items-center gap-6">
-                <img
-                  src={agent.image}
-                  alt={agent.name}
-                  className="w-24 h-24 rounded-full object-cover border-2 border-[#C5A880] shadow-xl"
-                />
-                <div className="space-y-1.5 text-center sm:text-left">
-                  <h4 className="font-serif text-2xl font-bold text-white">{agent.name}</h4>
-                  <p className="text-xs text-[#C5A880] uppercase tracking-widest font-semibold">{agent.title}</p>
-                  <p className="text-xs text-zinc-400 max-w-md pt-1 leading-relaxed">{agent.bio}</p>
+            {/* Project Location Map (Google Maps Embed) */}
+            <div className="bg-white p-8 sm:p-10 rounded-[36px] border border-stone-200/80 shadow-md space-y-5">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-stone-100 pb-4">
+                <div>
+                  <span className="text-[10px] uppercase tracking-widest text-[#C5A880] font-semibold block">
+                    Neighborhood & Geography
+                  </span>
+                  <h3 className="font-serif text-2xl font-bold text-[#0E1013] mt-0.5">
+                    Project Location
+                  </h3>
+                </div>
+                <div className="flex items-center gap-1.5 text-xs text-zinc-700 bg-[#FAF8F5] px-4 py-2 rounded-full border border-stone-200/80 self-start sm:self-auto">
+                  <MapPin className="w-4 h-4 text-[#C5A880] shrink-0" />
+                  <span className="font-semibold">{property.location || property.areaName}</span>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-6 border-t border-white/10">
+              <div className="relative aspect-[16/9] w-full rounded-[24px] overflow-hidden border border-stone-200 shadow-inner bg-stone-100">
+                <iframe
+                  title={`${property.title} Location Map`}
+                  src={`https://maps.google.com/maps?q=${encodeURIComponent(property.location || property.areaName || 'Chennai')}&t=&z=14&ie=UTF8&iwloc=&output=embed`}
+                  className="w-full h-full border-0"
+                  allowFullScreen=""
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
+              </div>
+
+              <div className="flex items-center justify-between pt-1">
+                <span className="text-xs text-zinc-500 font-light">
+                  {property.location || property.areaName}
+                </span>
                 <a
-                  href={whatsappUrl}
+                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(property.location || property.areaName || 'Chennai')}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="py-3.5 bg-[#25D366] text-white text-xs font-semibold uppercase tracking-widest rounded-full hover:bg-[#20ba59] transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-lg"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#C5A880] hover:text-[#b5966c] uppercase tracking-wider transition-colors"
                 >
-                  <MessageSquare className="w-4 h-4" />
-                  <span>WhatsApp Agent</span>
+                  <span>Open in Google Maps</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
                 </a>
-
-                <button
-                  onClick={() => onOpenInquiryModal ? onOpenInquiryModal(property.title) : navigate('/contact')}
-                  className="py-3.5 bg-[#C5A880] text-[#0E1013] text-xs font-semibold uppercase tracking-widest rounded-full hover:bg-[#b5966c] transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-lg"
-                >
-                  <Calendar className="w-4 h-4" />
-                  <span>Book Private Tour</span>
-                </button>
               </div>
             </div>
 
@@ -254,7 +306,7 @@ export default function PropertyDetails({ onOpenInquiryModal }) {
           {/* Sticky Desktop Enquiry Panel (1 Column) */}
           <div className="hidden lg:block lg:col-span-1">
             <div className="sticky top-28 bg-white p-8 rounded-[36px] border border-stone-200/80 shadow-xl space-y-6">
-              
+
               <div>
                 <span className="text-[10px] uppercase tracking-widest text-[#C5A880] font-semibold block">
                   Private Representation
@@ -299,6 +351,18 @@ export default function PropertyDetails({ onOpenInquiryModal }) {
                   <MessageSquare className="w-4 h-4" />
                   <span>WhatsApp Advisor</span>
                 </a>
+
+                {property.brochureUrl && (
+                  <a
+                    href={property.brochureUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full py-3.5 bg-[#FAF8F5] hover:bg-[#C5A880] hover:text-[#0E1013] text-[#0E1013] border border-[#C5A880]/50 text-xs font-bold uppercase tracking-widest rounded-full transition-colors flex items-center justify-center gap-2 shadow-sm"
+                  >
+                    <FileText className="w-4 h-4 text-[#C5A880]" />
+                    <span>Download Brochure</span>
+                  </a>
+                )}
               </div>
 
               <div className="pt-4 border-t border-stone-100 text-[11px] text-zinc-400 text-center leading-relaxed">
@@ -350,6 +414,18 @@ export default function PropertyDetails({ onOpenInquiryModal }) {
         </div>
 
         <div className="flex items-center gap-2">
+          {property.brochureUrl && (
+            <a
+              href={property.brochureUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-3 bg-white/10 hover:bg-[#C5A880] text-[#C5A880] hover:text-[#0E1013] border border-white/20 rounded-full transition-colors"
+              title="Download Brochure"
+            >
+              <FileText className="w-4 h-4" />
+            </a>
+          )}
+
           <a
             href={whatsappUrl}
             target="_blank"

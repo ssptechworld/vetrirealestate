@@ -1,15 +1,27 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Bed, Bath, Maximize2, MapPin, Heart, ArrowUpRight } from 'lucide-react';
+import { Bed, Bath, Maximize2, MapPin, Heart, ArrowUpRight, Building } from 'lucide-react';
 import { useFavorites } from '../context/FavoritesContext';
 import { fadeUp } from '../utils/animations';
 
 export default function PropertyCard({ property }) {
+  const [imageError, setImageError] = useState(false);
+  const navigate = useNavigate();
   const { isFavorite, toggleFavorite } = useFavorites();
-  const favorite = isFavorite(property.id);
+  const targetId = property?.id || property?._id || '';
+  const targetPath = `/properties/${targetId}`;
+  const favorite = isFavorite(targetId);
 
-  const isCompleted = property.status === 'Completed' || property.badge === 'Ready to Move' || property.badge === 'Completed';
+  const isCompleted = property?.status?.toLowerCase() === 'completed' || property?.badge === 'Ready to Move' || property?.badge === 'Completed';
+
+  const handleNavigate = (e) => {
+    if (!e.defaultPrevented && !e.metaKey && !e.ctrlKey) {
+      e.preventDefault();
+      e.stopPropagation();
+      navigate(targetPath);
+    }
+  };
 
   return (
     <motion.div
@@ -20,21 +32,26 @@ export default function PropertyCard({ property }) {
     >
       {/* Image Container with Architectural Arch Masking */}
       <div className="relative aspect-[4/3] overflow-hidden bg-[#0E1013] rounded-t-[32px] sm:rounded-t-[38px] rounded-bl-[40px] sm:rounded-bl-[52px]">
-        {property.heroImage ? (
+        {!imageError && property?.heroImage ? (
           <img
             src={property.heroImage}
             alt={property.title}
             loading="lazy"
             decoding="async"
-            onError={(e) => {
-              e.target.onerror = null;
-              e.target.src = 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=85';
-            }}
+            onError={() => setImageError(true)}
             className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-108"
           />
         ) : (
-          <div className="w-full h-full flex flex-col items-center justify-center bg-[#0E1013] text-stone-400 text-xs font-medium uppercase tracking-widest p-4 text-center">
-            <span>No Architectural Image</span>
+          <div className="w-full h-full flex flex-col items-center justify-center bg-[#121417] text-stone-400 text-xs p-6 text-center relative overflow-hidden">
+            <div className="w-12 h-12 rounded-full border border-[#C5A880]/30 bg-[#C5A880]/10 flex items-center justify-center text-[#C5A880] mb-2.5">
+              <Building className="w-6 h-6" />
+            </div>
+            <span className="font-serif text-sm font-bold text-white tracking-wide truncate max-w-[90%]">
+              {property?.title || 'Vetri Vel Project'}
+            </span>
+            <span className="text-[10px] text-[#C5A880] uppercase tracking-widest mt-1">
+              Architectural Preview
+            </span>
           </div>
         )}
 
@@ -47,7 +64,7 @@ export default function PropertyCard({ property }) {
               ? 'bg-[#121417]/90 text-[#C5A880] border-[#C5A880]/40'
               : 'bg-[#C5A880] text-[#121417] border-[#C5A880]'
             }`}>
-            {property.badge || (isCompleted ? 'Ready to Move' : 'Premium Residence')}
+            {property.badge || (isCompleted ? 'Completed' : 'Ongoing')}
           </span>
 
           {property.propertyType && (
@@ -100,7 +117,7 @@ export default function PropertyCard({ property }) {
           </div>
 
           {/* Title */}
-          <Link to={`/properties/${property.id}`}>
+          <Link to={targetPath} onClick={handleNavigate} className="cursor-pointer">
             <h3 className="font-serif text-lg sm:text-xl font-bold text-[#121417] group-hover:text-[#C5A880] transition-colors duration-300 line-clamp-1 mb-2">
               {property.title}
             </h3>
@@ -138,8 +155,9 @@ export default function PropertyCard({ property }) {
 
           {/* View Details Rounded Button */}
           <Link
-            to={`/properties/${property.id}`}
-            className="w-full py-3 px-5 bg-transparent border border-[#121417]/25 group-hover:border-[#121417] text-[#121417] group-hover:bg-[#121417] group-hover:text-white text-xs tracking-widest font-bold uppercase rounded-full transition-all duration-300 flex items-center justify-center gap-2"
+            to={targetPath}
+            onClick={handleNavigate}
+            className="w-full py-3 px-5 bg-transparent border border-[#121417]/25 group-hover:border-[#121417] text-[#121417] group-hover:bg-[#121417] group-hover:text-white text-xs tracking-widest font-bold uppercase rounded-full transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
           >
             <span>Explore Residence</span>
             <ArrowUpRight className="w-4 h-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />

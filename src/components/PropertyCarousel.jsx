@@ -21,6 +21,19 @@ export default function PropertyCarousel({ properties = [] }) {
 
   if (!properties || properties.length === 0) return null;
 
+  // When 3 or fewer items are in database, render a clean responsive grid without cloning duplicates
+  if (totalItems <= 3) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 py-4 px-1">
+        {properties.map((property, idx) => (
+          <div key={`${property.id || property._id}-${idx}`} className="w-full">
+            <PropertyCard property={property} />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
   // Triplicate properties array to create a seamless infinite loop in both directions
   const displayItems = [...properties, ...properties, ...properties];
 

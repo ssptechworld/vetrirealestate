@@ -18,71 +18,86 @@ export default function PropertyGallery({ gallery = [], title = "Property Galler
     setSelectedIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
   };
 
+  const hasMultipleImages = images.length > 1;
+
   return (
     <div className="space-y-4">
       {/* Main Image Showcase */}
       <div
         onClick={() => setIsLightboxOpen(true)}
-        className="relative aspect-[16/9] md:aspect-[21/9] rounded-xs overflow-hidden bg-stone-900 group cursor-pointer border border-stone-200"
+        className="relative aspect-[16/9] md:aspect-[21/9] rounded-2xl overflow-hidden bg-stone-900 group cursor-pointer border border-stone-200/80 shadow-md"
       >
         <AnimatePresence mode="wait">
           <motion.img
             key={selectedIndex}
             src={images[selectedIndex]}
             alt={`${title} - Photo ${selectedIndex + 1}`}
-            initial={{ opacity: 0.4 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0.4 }}
-            transition={{ duration: 0.4 }}
+            initial={{ opacity: 0.3, scale: 0.99 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0.3 }}
+            transition={{ duration: 0.35, ease: 'easeInOut' }}
             className="w-full h-full object-cover"
           />
         </AnimatePresence>
 
         {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20 pointer-events-none" />
 
-        {/* Controls */}
-        <div className="absolute inset-0 flex items-center justify-between px-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <button
-            onClick={handlePrev}
-            className="p-3 rounded-full bg-black/60 text-white hover:bg-[#C5A880] hover:text-[#121417] backdrop-blur-md transition-all cursor-pointer"
-            aria-label="Previous photo"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
+        {/* Navigation Controls (Shown when multiple images exist) */}
+        {hasMultipleImages && (
+          <div className="absolute inset-x-4 top-1/2 -translate-y-1/2 flex items-center justify-between pointer-events-none">
+            <button
+              onClick={handlePrev}
+              className="p-3 rounded-full bg-black/60 text-white hover:bg-[#C5A880] hover:text-[#121417] backdrop-blur-md transition-all cursor-pointer pointer-events-auto border border-white/10 shadow-lg"
+              aria-label="Previous photo"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
 
-          <button
-            onClick={handleNext}
-            className="p-3 rounded-full bg-black/60 text-white hover:bg-[#C5A880] hover:text-[#121417] backdrop-blur-md transition-all cursor-pointer"
-            aria-label="Next photo"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </button>
-        </div>
+            <button
+              onClick={handleNext}
+              className="p-3 rounded-full bg-black/60 text-white hover:bg-[#C5A880] hover:text-[#121417] backdrop-blur-md transition-all cursor-pointer pointer-events-auto border border-white/10 shadow-lg"
+              aria-label="Next photo"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </div>
+        )}
+
+        {/* Image Counter Badge: 1 / 6 */}
+        {hasMultipleImages && (
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-black/75 backdrop-blur-md text-white text-xs font-mono font-semibold rounded-full border border-white/15 shadow-md flex items-center gap-1.5">
+            <span>{selectedIndex + 1}</span>
+            <span className="text-zinc-400">/</span>
+            <span>{images.length}</span>
+          </div>
+        )}
 
         {/* Lightbox Trigger Badge */}
-        <div className="absolute bottom-4 right-4 px-3 py-1.5 bg-black/75 backdrop-blur-md text-white text-xs font-medium rounded-xs flex items-center gap-2 border border-white/10">
+        <div className="absolute bottom-4 right-4 px-3 py-1.5 bg-black/75 backdrop-blur-md text-white text-xs font-medium rounded-full flex items-center gap-2 border border-white/10 shadow-md">
           <Maximize2 className="w-3.5 h-3.5 text-[#C5A880]" />
-          <span>Fullscreen Gallery ({selectedIndex + 1}/{images.length})</span>
+          <span>Fullscreen</span>
         </div>
       </div>
 
-      {/* Thumbnails Row */}
-      <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-none">
-        {images.map((img, idx) => (
-          <button
-            key={idx}
-            onClick={() => setSelectedIndex(idx)}
-            className={`relative flex-shrink-0 w-24 h-16 rounded-xs overflow-hidden border-2 transition-all cursor-pointer ${
-              selectedIndex === idx
-                ? 'border-[#C5A880] opacity-100 scale-105 shadow-md'
-                : 'border-transparent opacity-60 hover:opacity-100'
-            }`}
-          >
-            <img src={img} alt={`Thumbnail ${idx + 1}`} className="w-full h-full object-cover" />
-          </button>
-        ))}
-      </div>
+      {/* Thumbnails Row (Shown when multiple images exist) */}
+      {hasMultipleImages && (
+        <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-none">
+          {images.map((img, idx) => (
+            <button
+              key={idx}
+              onClick={() => setSelectedIndex(idx)}
+              className={`relative flex-shrink-0 w-24 h-16 rounded-xl overflow-hidden border-2 transition-all cursor-pointer ${
+                selectedIndex === idx
+                  ? 'border-[#C5A880] opacity-100 scale-105 shadow-md'
+                  : 'border-transparent opacity-60 hover:opacity-100'
+              }`}
+            >
+              <img src={img} alt={`Thumbnail ${idx + 1}`} className="w-full h-full object-cover" />
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Fullscreen Lightbox Modal */}
       <AnimatePresence>

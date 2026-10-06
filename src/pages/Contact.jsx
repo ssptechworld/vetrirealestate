@@ -1,44 +1,145 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, Phone, Mail, Clock, Send, CheckCircle2, Shield } from 'lucide-react';
-import { PROPERTIES_DATA } from '../data/properties';
+import { MapPin, Phone, Mail, Clock, Send, CheckCircle2, Shield, ExternalLink } from 'lucide-react';
+import { getOngoingProjects, formatProjectForCarousel } from '../services/projectService';
 import { fadeUp } from '../utils/animations';
 
+// Helper to extract and format project details (Title, BHK, Sq.ft, Rate)
+const getProjectDetails = (p) => {
+  if (!p) return { name: '', bhk: '', area: '', price: '', label: '' };
+  const raw = p.rawProject || p;
+
+  const name = raw.name || p.title || 'Ongoing Project';
+
+  let bhk = raw.bedrooms || p.bedrooms || '';
+  if (bhk && !bhk.toLowerCase().includes('bhk')) {
+    bhk = `${bhk} BHK`;
+  }
+
+  let area = raw.area || (p.sqft ? `${p.sqft} Sq.ft` : '');
+  if (area && !area.toLowerCase().includes('sq')) {
+    area = `${area} Sq.ft`;
+  }
+
+  let price = raw.price || p.formattedPrice || '';
+  if (price && !price.startsWith('₹') && !price.toLowerCase().includes('lakh') && !price.toLowerCase().includes('cr')) {
+    price = `₹${price}`;
+  }
+
+  const parts = [name];
+  if (bhk) parts.push(bhk);
+  if (area) parts.push(area);
+  if (price) parts.push(price);
+
+  const label = parts.join(' — ');
+
+  return { name, bhk, area, price, label };
+};
+
 export default function Contact() {
+  const [ongoingProjects, setOngoingProjects] = useState([]);
+  const [loadingProjects, setLoadingProjects] = useState(true);
   const [submitted, setSubmitted] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
-    property: PROPERTIES_DATA[0].title,
+    property: '',
     message: ''
   });
 
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchProjects = async () => {
+      try {
+        setLoadingProjects(true);
+        const data = await getOngoingProjects();
+        if (isMounted) {
+          const formatted = (Array.isArray(data) ? data : [])
+            .map(formatProjectForCarousel)
+            .filter(Boolean);
+          setOngoingProjects(formatted);
+          if (formatted.length > 0) {
+            setFormData((prev) => ({
+              ...prev,
+              property: prev.property || formatted[0].id
+            }));
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch ongoing projects for contact form:', err);
+        if (isMounted) {
+          setOngoingProjects([]);
+        }
+      } finally {
+        if (isMounted) {
+          setLoadingProjects(false);
+        }
+      }
+    };
+
+    fetchProjects();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (!formData.name.trim() || !formData.phone.trim() || !formData.email.trim() || !formData.message.trim()) {
+      return;
+    }
+
+    // Match selected project from ongoingProjects by id or title
+    const selectedProj = ongoingProjects.find(
+      (p) => p.id === formData.property || p.title === formData.property
+    ) || ongoingProjects[0];
+
+    const details = getProjectDetails(selectedProj);
+    const projectName = details.name || formData.property || 'N/A';
+    const bhk = details.bhk || 'N/A';
+    const area = details.area || 'N/A';
+    const rate = details.price || 'Price on Request';
+
+    // Construct WhatsApp message dynamically
+    const messageLines = [
+      'New Property Enquiry',
+      '',
+      `Full Name: ${formData.name.trim()}`,
+      `Phone Number: ${formData.phone.trim()}`,
+      `Email Address: ${formData.email.trim()}`,
+      '',
+      `Property Interested In: ${projectName}`,
+      `BHK: ${bhk}`,
+      `Area: ${area}`,
+      `Rate: ${rate}`,
+      '',
+      'Message:',
+      formData.message.trim()
+    ];
+
+    const whatsappUrl = `https://wa.me/919380005934?text=${encodeURIComponent(messageLines.join('\n'))}`;
+
+    window.open(whatsappUrl, '_blank');
     setSubmitted(true);
   };
 
-  const offices = [
-    {
-      city: "Boat Club Flagship Lounge",
-      address: "No. 14 Boat Club Road, RA Puram, Chennai - 600028",
-      phone: "+91 44 2435 9000",
-      email: "concierge@vetrivelrealestate.com",
-      hours: "Mon – Sat: 9:00 AM – 7:00 PM"
-    },
-    {
-      city: "ECR Coastal Lounge",
-      address: "Mile 12, East Coast Road, Covelong Bay, Chennai - 603112",
-      phone: "+91 44 2747 8800",
-      email: "ecr@vetrivelrealestate.com",
-      hours: "Mon – Sun: 10:00 AM – 6:00 PM"
-    }
-  ];
+  const office = {
+    name: "Vetri Vel Real Estate Head Office",
+    address: "No. 16, Santro City, Chembarambakkam, Chennai - 600123",
+    phone: "+91 93800 05934",
+    email: "concierge@vetrivelrealestate.com",
+    hours: "Mon – Sat: 9:00 AM – 7:00 PM",
+    mapUrl: "https://www.google.com/maps/search/?api=1&query=16,+Santro+City,+Chembarambakkam,+Chennai",
+    embedUrl: "https://maps.google.com/maps?q=16,+Santro+City,+Chembarambakkam,+Chennai&t=&z=15&ie=UTF8&iwloc=&output=embed"
+  };
 
   return (
     <div className="min-h-screen bg-[#FAF8F5]/80 backdrop-blur-xs pt-28 pb-24">
-      
+
       {/* Header Banner */}
       <section className="bg-[#0E1013] text-white pt-16 pb-20 mb-16 border-b border-[#C5A880]/20 rounded-b-[48px] sm:rounded-b-[80px] shadow-2xl relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#C5A880]/15 via-transparent to-transparent pointer-events-none" />
@@ -58,10 +159,10 @@ export default function Contact() {
       {/* Main Content Grid */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-          
+
           {/* Form Side (7 Cols) */}
           <div className="lg:col-span-7 bg-white p-8 sm:p-12 rounded-[36px] border border-stone-200/80 shadow-xl">
-            
+
             {submitted ? (
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
@@ -77,7 +178,16 @@ export default function Contact() {
                 </p>
                 <div className="pt-4">
                   <button
-                    onClick={() => setSubmitted(false)}
+                    onClick={() => {
+                      setFormData({
+                        name: '',
+                        email: '',
+                        phone: '',
+                        property: ongoingProjects[0]?.id || '',
+                        message: ''
+                      });
+                      setSubmitted(false);
+                    }}
                     className="px-8 py-3 bg-[#0E1013] text-[#C5A880] border border-[#C5A880]/30 text-xs uppercase tracking-widest font-semibold rounded-full hover:bg-[#C5A880] hover:text-[#0E1013] transition-colors shadow-md"
                   >
                     Submit Another Query
@@ -145,25 +255,32 @@ export default function Contact() {
                     <select
                       value={formData.property}
                       onChange={(e) => setFormData({ ...formData, property: e.target.value })}
-                      className="w-full px-5 py-3.5 bg-[#FAF8F5] border border-stone-200/90 rounded-2xl text-sm text-[#0E1013] focus:outline-none focus:border-[#C5A880] cursor-pointer transition-colors"
+                      disabled={loadingProjects}
+                      className="w-full px-5 py-3.5 bg-[#FAF8F5] border border-stone-200/90 rounded-2xl text-sm text-[#0E1013] focus:outline-none focus:border-[#C5A880] cursor-pointer transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      {PROPERTIES_DATA.map((p) => (
-                        <option key={p.id} value={p.title}>
-                          {p.title} ({p.formattedPrice})
-                        </option>
-                      ))}
+                      {loadingProjects ? (
+                        <option value="">Loading ongoing projects...</option>
+                      ) : ongoingProjects.length === 0 ? (
+                        <option value="">No ongoing projects available</option>
+                      ) : (
+                        ongoingProjects.map((p) => (
+                          <option key={p.id} value={p.id}>
+                            {getProjectDetails(p).label}
+                          </option>
+                        ))
+                      )}
                     </select>
                   </div>
                 </div>
 
                 <div>
                   <label className="text-xs font-semibold uppercase tracking-wider text-zinc-700 block mb-1.5">
-                    Your Message or Special Requirements
+                    Any doubt about the flat?
                   </label>
                   <textarea
                     rows="4"
                     required
-                    placeholder="Provide details about your preferred move timeline, location preferences, or off-market search criteria..."
+                    placeholder="Ask anything...."
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                     className="w-full px-5 py-3.5 bg-[#FAF8F5] border border-stone-200/90 rounded-2xl text-sm text-[#0E1013] focus:outline-none focus:border-[#C5A880] transition-colors"
@@ -182,57 +299,88 @@ export default function Contact() {
 
           </div>
 
-          {/* Office Information Side (5 Cols) */}
+          {/* Office Information & Map Side (5 Cols) */}
           <div className="lg:col-span-5 space-y-8">
-            
-            {offices.map((office, idx) => (
-              <div key={idx} className="bg-[#0E1013] text-white p-8 rounded-[32px] border border-[#C5A880]/30 shadow-xl space-y-5 relative overflow-hidden">
-                <span className="text-[10px] uppercase tracking-widest text-[#C5A880] font-semibold block">
-                  Private Lounge location
-                </span>
-                <h4 className="font-serif text-2xl font-bold text-white">{office.city}</h4>
 
-                <div className="space-y-3.5 text-xs text-zinc-300 font-light">
-                  <div className="flex items-start gap-3">
-                    <MapPin className="w-4 h-4 text-[#C5A880] shrink-0 mt-0.5" />
-                    <span>{office.address}</span>
-                  </div>
+            {/* Single Luxury Office Card */}
+            <div className="bg-[#0E1013] text-white p-8 rounded-[32px] border border-[#C5A880]/30 shadow-xl space-y-5 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[#C5A880]/15 via-transparent to-transparent pointer-events-none" />
+              <span className="text-[10px] uppercase tracking-widest text-[#C5A880] font-semibold block">
+                Headquarters & Advisory Lounge
+              </span>
+              <h4 className="font-serif text-2xl font-bold text-white">{office.name}</h4>
 
-                  <div className="flex items-center gap-3">
-                    <Phone className="w-4 h-4 text-[#C5A880] shrink-0" />
-                    <span>{office.phone}</span>
-                  </div>
+              <div className="space-y-3.5 text-xs text-zinc-300 font-light">
+                <div className="flex items-start gap-3">
+                  <MapPin className="w-4 h-4 text-[#C5A880] shrink-0 mt-0.5" />
+                  <span className="leading-relaxed">{office.address}</span>
+                </div>
 
-                  <div className="flex items-center gap-3">
-                    <Mail className="w-4 h-4 text-[#C5A880] shrink-0" />
-                    <span>{office.email}</span>
-                  </div>
+                <div className="flex items-center gap-3">
+                  <Phone className="w-4 h-4 text-[#C5A880] shrink-0" />
+                  <a
+                    href={`tel:${office.phone.replace(/\s+/g, '')}`}
+                    className="hover:text-[#C5A880] transition-colors"
+                  >
+                    {office.phone}
+                  </a>
+                </div>
 
-                  <div className="flex items-center gap-3 pt-3 border-t border-white/10 text-[#C5A880] font-medium">
-                    <Clock className="w-4 h-4 shrink-0" />
-                    <span>{office.hours}</span>
-                  </div>
+                <div className="flex items-center gap-3">
+                  <Mail className="w-4 h-4 text-[#C5A880] shrink-0" />
+                  <a
+                    href={`mailto:${office.email}`}
+                    className="hover:text-[#C5A880] transition-colors"
+                  >
+                    {office.email}
+                  </a>
+                </div>
+
+                <div className="flex items-center gap-3 pt-3 border-t border-white/10 text-[#C5A880] font-medium">
+                  <Clock className="w-4 h-4 shrink-0" />
+                  <span>{office.hours}</span>
                 </div>
               </div>
-            ))}
+            </div>
 
-            {/* Interactive Map Visual Mockup */}
+            {/* Real Google Maps Embed */}
             <div className="bg-white p-8 rounded-[32px] border border-stone-200/80 shadow-md space-y-4">
-              <span className="text-[10px] uppercase tracking-widest text-[#C5A880] font-semibold block">
-                Flagship Location Map
-              </span>
-              <div className="relative aspect-[16/9] bg-stone-900 rounded-[24px] overflow-hidden border border-stone-300 shadow-inner">
-                <img
-                  src="https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&w=800&q=85"
-                  alt="City Map Location"
-                  className="w-full h-full object-cover opacity-60"
+              <div>
+                <span className="text-[10px] uppercase tracking-widest text-[#C5A880] font-semibold block">
+                  VISIT OUR OFFICE
+                </span>
+                <h4 className="font-serif text-xl font-bold text-[#0E1013] mt-0.5">
+                  Our Office Location
+                </h4>
+                <p className="text-xs text-zinc-500 font-light mt-1">
+                  {office.address}
+                </p>
+              </div>
+
+              <div className="relative aspect-[16/10] bg-stone-100 rounded-[24px] overflow-hidden border border-stone-200 shadow-inner">
+                <iframe
+                  title="Vetri Vel Real Estate Office Location"
+                  src={office.embedUrl}
+                  className="w-full h-full border-0"
+                  allowFullScreen=""
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
                 />
-                <div className="absolute inset-0 flex items-center justify-center p-4">
-                  <div className="px-5 py-3 bg-[#0E1013]/90 text-white text-xs font-serif font-bold rounded-full border border-[#C5A880] flex items-center gap-2 shadow-2xl backdrop-blur-sm">
-                    <MapPin className="w-4 h-4 text-[#C5A880]" />
-                    <span>Vetri Vel Flagship Lounge, RA Puram</span>
-                  </div>
-                </div>
+              </div>
+
+              <div className="pt-1 flex items-center justify-between">
+                <span className="text-[11px] text-zinc-400 font-light">
+                  Chembarambakkam, Chennai
+                </span>
+                <a
+                  href={office.mapUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#C5A880] hover:text-[#b5966c] uppercase tracking-wider transition-colors"
+                >
+                  <span>Open in Google Maps</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
               </div>
             </div>
 

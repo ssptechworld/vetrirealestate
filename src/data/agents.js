@@ -1,8 +1,8 @@
 export const AGENTS_DATA = [
   {
     id: "agent-1",
-    name: "Vikramaditya Singhania",
-    title: "Managing Director – Coastal & Waterfront",
+    name: "Vijayakumar",
+    title: "Owner",
     experience: "16+ Years Experience",
     propertiesHandled: "85+ Trophy Estates",
     salesVolume: "₹1,400+ Cr Sold",

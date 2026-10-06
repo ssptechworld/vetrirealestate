@@ -1,25 +1,41 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Mail, Phone, MapPin, ArrowRight, Share2, Globe, Compass } from 'lucide-react';
+import { ArrowRight, Share2, Globe, Compass } from 'lucide-react';
 
 export default function Footer() {
   const [subscribed, setSubscribed] = useState(false);
-  const [email, setEmail] = useState('');
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
 
   const handleSubscribe = (e) => {
     e.preventDefault();
-    if (email.trim()) {
-      setSubscribed(true);
-      setEmail('');
-    }
+    if (!name.trim() || !phone.trim()) return;
+
+    const messageLines = [
+      'New Private Journal Subscription',
+      '',
+      `Name: ${name.trim()}`,
+      `Phone Number: ${phone.trim()}`,
+      '',
+      'I would like to receive private property and off-market estate updates.'
+    ];
+
+    const whatsappText = messageLines.join('\n');
+    const whatsappUrl = `https://wa.me/919380005934?text=${encodeURIComponent(whatsappText)}`;
+
+    window.open(whatsappUrl, '_blank');
+
+    setName('');
+    setPhone('');
+    setSubscribed(true);
   };
 
   return (
     <footer className="bg-[#0E1013] text-zinc-400 border-t border-[#C5A880]/20 rounded-t-[48px] sm:rounded-t-[80px] pt-20 pb-12 shadow-2xl relative overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#C5A880]/10 via-transparent to-transparent pointer-events-none" />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 pb-16 border-b border-white/10">
-          
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 pb-16 border-b border-white/10">
+
           {/* Col 1: Brand Info */}
           <div className="lg:col-span-2 flex flex-col space-y-6">
             <Link to="/" className="flex items-center gap-3">
@@ -77,34 +93,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Col 3: Prime Locations */}
-          <div>
-            <h4 className="font-serif text-white text-base tracking-wider uppercase mb-5 border-b border-[#C5A880]/30 pb-2 inline-block">
-              Prime Sanctuaries
-            </h4>
-            <ul className="space-y-3 text-sm font-light">
-              <li>
-                <Link to="/properties?location=ECR+Seaside" className="hover:text-[#C5A880] transition-colors">East Coast Road (ECR)</Link>
-              </li>
-              <li>
-                <Link to="/properties?location=Boat+Club+%2F+Adyar" className="hover:text-[#C5A880] transition-colors">Boat Club, Adyar</Link>
-              </li>
-              <li>
-                <Link to="/properties?location=Anna+Nagar" className="hover:text-[#C5A880] transition-colors">Anna Nagar Boulevard</Link>
-              </li>
-              <li>
-                <Link to="/properties?location=Mahabalipuram+Coast" className="hover:text-[#C5A880] transition-colors">Mahabalipuram Coast</Link>
-              </li>
-              <li>
-                <Link to="/properties?location=Poes+Garden" className="hover:text-[#C5A880] transition-colors">Poes Garden Enclave</Link>
-              </li>
-              <li>
-                <Link to="/properties?location=Coimbatore+Central" className="hover:text-[#C5A880] transition-colors">Race Course, Coimbatore</Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Col 4: Private Lounge & Newsletter */}
+          {/* Col 3: Private Lounge & Newsletter */}
           <div>
             <h4 className="font-serif text-white text-base tracking-wider uppercase mb-5 border-b border-[#C5A880]/30 pb-2 inline-block">
               Private Journal
@@ -115,23 +104,31 @@ export default function Footer() {
 
             {subscribed ? (
               <div className="p-4 bg-[#C5A880]/15 border border-[#C5A880] text-[#C5A880] text-xs rounded-2xl font-semibold">
-                ✓ Thank you. You are subscribed to off-market previews.
+                ✓ Thank you. We will contact you shortly.
               </div>
             ) : (
               <form onSubmit={handleSubscribe} className="flex flex-col space-y-3">
                 <input
-                  type="email"
+                  type="text"
                   required
-                  placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="px-4 py-3 bg-white/5 border border-white/15 rounded-full text-sm text-white focus:outline-none focus:border-[#C5A880] transition-colors"
+                />
+                <input
+                  type="tel"
+                  required
+                  placeholder="Enter your phone number"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
                   className="px-4 py-3 bg-white/5 border border-white/15 rounded-full text-sm text-white focus:outline-none focus:border-[#C5A880] transition-colors"
                 />
                 <button
                   type="submit"
                   className="px-5 py-3 bg-[#C5A880] text-[#0E1013] text-xs font-semibold uppercase tracking-widest rounded-full hover:bg-[#b5966c] transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-md"
                 >
-                  <span>Subscribe</span>
+                  <span>Submit</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
               </form>

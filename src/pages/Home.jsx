@@ -31,11 +31,11 @@ import {
   Droplets,
   Sprout,
   Gamepad2,
-  PlugZap
+  PlugZap,
+  AlertCircle
 } from 'lucide-react';
 import PropertyCarousel from '../components/PropertyCarousel';
 import StatsSection from '../components/StatsSection';
-import { PROPERTIES_DATA } from '../data/properties';
 import { fadeUp, staggerContainer, EASE_LUXURY } from '../utils/animations';
 import homeHeroImg from '../assets/Home.png';
 import workVideo from '../assets/work.mp4';
@@ -55,60 +55,57 @@ import digitalLockImg from '../assets/Goorej.png';
 import luxuryElevatorImg from '../assets/Lift.png';
 import jaquarBathroomImg from '../assets/Jaquar.png';
 
-import { getOngoingProjects, getCompletedProjects, formatProjectForCarousel } from '../services/projectService';
+import { getProjects, formatProjectForCarousel } from '../services/projectService';
 
 export default function Home({ onOpenInquiryModal }) {
   const navigate = useNavigate();
 
   const [ongoingProperties, setOngoingProperties] = useState([]);
   const [completedProperties, setCompletedProperties] = useState([]);
-  const [loadingOngoing, setLoadingOngoing] = useState(true);
-  const [loadingCompleted, setLoadingCompleted] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [isVideoMuted, setIsVideoMuted] = useState(true);
 
   useEffect(() => {
     let isMounted = true;
 
-    const fetchOngoing = async () => {
+    const fetchProjectsFromDatabase = async () => {
       try {
-        setLoadingOngoing(true);
-        const data = await getOngoingProjects();
+        setLoading(true);
+        setError(null);
+
+        // Fetch real projects from backend database API
+        const data = await getProjects();
+
         if (isMounted) {
-          const formatted = data.map(formatProjectForCarousel).filter(Boolean);
-          setOngoingProperties(formatted);
+          const rawProjects = Array.isArray(data) ? data : [];
+
+          // Separate real projects based on actual database status
+          const ongoingRaw = rawProjects.filter(
+            (project) => project.status?.toLowerCase() === 'ongoing'
+          );
+          const completedRaw = rawProjects.filter(
+            (project) => project.status?.toLowerCase() === 'completed'
+          );
+
+          setOngoingProperties(ongoingRaw.map(formatProjectForCarousel).filter(Boolean));
+          setCompletedProperties(completedRaw.map(formatProjectForCarousel).filter(Boolean));
         }
       } catch (err) {
-        console.error('Ongoing projects fetch error:', err);
+        console.error('Error fetching database projects in Home:', err);
         if (isMounted) {
-          const fallback = PROPERTIES_DATA.slice(0, 4);
-          setOngoingProperties(fallback);
+          setError('Unable to load projects. Please try again later.');
+          setOngoingProperties([]);
+          setCompletedProperties([]);
         }
       } finally {
-        if (isMounted) setLoadingOngoing(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
-    const fetchCompleted = async () => {
-      try {
-        setLoadingCompleted(true);
-        const data = await getCompletedProjects();
-        if (isMounted) {
-          const formatted = data.map(formatProjectForCarousel).filter(Boolean);
-          setCompletedProperties(formatted);
-        }
-      } catch (err) {
-        console.error('Completed projects fetch error:', err);
-        if (isMounted) {
-          const fallback = PROPERTIES_DATA.slice(4);
-          setCompletedProperties(fallback);
-        }
-      } finally {
-        if (isMounted) setLoadingCompleted(false);
-      }
-    };
-
-    fetchOngoing();
-    fetchCompleted();
+    fetchProjectsFromDatabase();
 
     return () => {
       isMounted = false;
@@ -443,23 +440,63 @@ export default function Home({ onOpenInquiryModal }) {
             </Link>
           </motion.div>
 
-          {/* Properties Carousel */}
+          {/* Properties Carousel / Loading / Error / Empty States */}
           <motion.div
             variants={fadeUp}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-50px" }}
           >
-            {loadingCompleted ? (
-              <div className="py-16 flex justify-center items-center gap-3 text-[#C5A880]">
-                <div className="w-5 h-5 border-2 border-[#C5A880] border-t-transparent rounded-full animate-spin" />
-                <span className="uppercase tracking-widest font-bold text-xs text-stone-600">Loading Completed Residences...</span>
+            {loading ? (
+              <div className="space-y-6">
+                <div className="py-4 flex justify-center items-center gap-3 text-[#C5A880]">
+                  <div className="w-5 h-5 border-2 border-[#C5A880] border-t-transparent rounded-full animate-spin" />
+                  <span className="uppercase tracking-widest font-bold text-xs text-stone-600">
+                    Loading Completed Residences...
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 py-2">
+                  {[1, 2, 3].map((n) => (
+                    <div
+                      key={n}
+                      className="bg-white rounded-[32px] sm:rounded-[38px] p-5 border border-stone-200/80 shadow-xs animate-pulse space-y-4"
+                    >
+                      <div className="aspect-[4/3] rounded-[28px] bg-stone-200/80" />
+                      <div className="p-2 space-y-3">
+                        <div className="h-3 bg-stone-200/60 rounded-full w-1/3" />
+                        <div className="h-5 bg-stone-200/80 rounded-full w-3/4" />
+                        <div className="h-9 bg-stone-100 rounded-full w-full mt-4" />
+                        <div className="h-10 bg-stone-200/60 rounded-full w-full mt-2" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : error ? (
+              <div className="py-14 px-6 text-center bg-stone-50 border border-stone-200/80 rounded-[32px] max-w-lg mx-auto space-y-3">
+                <div className="w-12 h-12 mx-auto rounded-full bg-amber-50 border border-amber-200 text-amber-700 flex items-center justify-center">
+                  <AlertCircle className="w-6 h-6" />
+                </div>
+                <h3 className="font-serif text-lg font-bold text-[#121417]">
+                  Unable to load projects.
+                </h3>
+                <p className="text-xs text-stone-500 font-light">
+                  Please try again later.
+                </p>
               </div>
             ) : completedProperties.length > 0 ? (
               <PropertyCarousel properties={completedProperties} />
             ) : (
-              <div className="py-12 text-center text-stone-500 bg-[#FAF8F5] border border-stone-200/80 rounded-3xl">
-                <p className="text-sm font-medium">No completed projects currently listed in database.</p>
+              <div className="py-16 px-6 text-center bg-[#FAF8F5] border border-stone-200/80 rounded-[32px] max-w-lg mx-auto space-y-3 shadow-xs">
+                <div className="w-12 h-12 mx-auto rounded-full bg-[#C5A880]/10 border border-[#C5A880]/30 text-[#C5A880] flex items-center justify-center">
+                  <Building className="w-6 h-6" />
+                </div>
+                <h3 className="font-serif text-xl font-bold text-[#121417]">
+                  No Completed Projects
+                </h3>
+                <p className="text-xs sm:text-sm text-stone-500 font-light">
+                  Our completed residences will be showcased here.
+                </p>
               </div>
             )}
           </motion.div>
@@ -497,23 +534,63 @@ export default function Home({ onOpenInquiryModal }) {
             </Link>
           </motion.div>
 
-          {/* Properties Carousel */}
+          {/* Properties Carousel / Loading / Error / Empty States */}
           <motion.div
             variants={fadeUp}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-50px" }}
           >
-            {loadingOngoing ? (
-              <div className="py-16 flex justify-center items-center gap-3 text-[#C5A880]">
-                <div className="w-5 h-5 border-2 border-[#C5A880] border-t-transparent rounded-full animate-spin" />
-                <span className="uppercase tracking-widest font-bold text-xs text-stone-600">Loading Ongoing Developments...</span>
+            {loading ? (
+              <div className="space-y-6">
+                <div className="py-4 flex justify-center items-center gap-3 text-[#C5A880]">
+                  <div className="w-5 h-5 border-2 border-[#C5A880] border-t-transparent rounded-full animate-spin" />
+                  <span className="uppercase tracking-widest font-bold text-xs text-stone-600">
+                    Loading Ongoing Developments...
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 py-2">
+                  {[1, 2, 3].map((n) => (
+                    <div
+                      key={n}
+                      className="bg-white rounded-[32px] sm:rounded-[38px] p-5 border border-stone-200/80 shadow-xs animate-pulse space-y-4"
+                    >
+                      <div className="aspect-[4/3] rounded-[28px] bg-stone-200/80" />
+                      <div className="p-2 space-y-3">
+                        <div className="h-3 bg-stone-200/60 rounded-full w-1/3" />
+                        <div className="h-5 bg-stone-200/80 rounded-full w-3/4" />
+                        <div className="h-9 bg-stone-100 rounded-full w-full mt-4" />
+                        <div className="h-10 bg-stone-200/60 rounded-full w-full mt-2" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : error ? (
+              <div className="py-14 px-6 text-center bg-white border border-stone-200/80 rounded-[32px] max-w-lg mx-auto space-y-3">
+                <div className="w-12 h-12 mx-auto rounded-full bg-amber-50 border border-amber-200 text-amber-700 flex items-center justify-center">
+                  <AlertCircle className="w-6 h-6" />
+                </div>
+                <h3 className="font-serif text-lg font-bold text-[#121417]">
+                  Unable to load projects.
+                </h3>
+                <p className="text-xs text-stone-500 font-light">
+                  Please try again later.
+                </p>
               </div>
             ) : ongoingProperties.length > 0 ? (
               <PropertyCarousel properties={ongoingProperties} />
             ) : (
-              <div className="py-12 text-center text-stone-500 bg-white border border-stone-200/80 rounded-3xl">
-                <p className="text-sm font-medium">No ongoing developments listed.</p>
+              <div className="py-16 px-6 text-center bg-white border border-stone-200/80 rounded-[32px] max-w-lg mx-auto space-y-3 shadow-xs">
+                <div className="w-12 h-12 mx-auto rounded-full bg-[#C5A880]/10 border border-[#C5A880]/30 text-[#C5A880] flex items-center justify-center">
+                  <Building className="w-6 h-6" />
+                </div>
+                <h3 className="font-serif text-xl font-bold text-[#121417]">
+                  No Ongoing Projects
+                </h3>
+                <p className="text-xs sm:text-sm text-stone-500 font-light">
+                  New developments will be showcased here.
+                </p>
               </div>
             )}
           </motion.div>
@@ -757,13 +834,12 @@ export default function Home({ onOpenInquiryModal }) {
                     key={idx}
                     variants={fadeUp}
                     whileHover={{ y: -7 }}
-                    className={`group relative rounded-[28px] sm:rounded-[36px] border border-white/20 hover:border-[#C5A880]/80 shadow-md hover:shadow-2xl hover:shadow-[#C5A880]/20 transition-all duration-500 flex flex-col justify-between overflow-hidden bg-[#121417] ${
-                      isHero
+                    className={`group relative rounded-[28px] sm:rounded-[36px] border border-white/20 hover:border-[#C5A880]/80 shadow-md hover:shadow-2xl hover:shadow-[#C5A880]/20 transition-all duration-500 flex flex-col justify-between overflow-hidden bg-[#121417] ${isHero
                         ? "sm:col-span-2 lg:col-span-2 lg:row-span-2 p-7 sm:p-9 min-h-[380px] sm:min-h-[460px]"
                         : isWideFeature
-                        ? "sm:col-span-2 lg:col-span-2 p-6 sm:p-7 min-h-[220px] sm:min-h-[240px]"
-                        : "col-span-1 p-6 sm:p-7 min-h-[220px] sm:min-h-[240px]"
-                    }`}
+                          ? "sm:col-span-2 lg:col-span-2 p-6 sm:p-7 min-h-[220px] sm:min-h-[240px]"
+                          : "col-span-1 p-6 sm:p-7 min-h-[220px] sm:min-h-[240px]"
+                      }`}
                   >
                     {/* Unique Full-Bleed Architectural Photography Background */}
                     <div className="absolute inset-0 z-0 overflow-hidden">
@@ -801,11 +877,10 @@ export default function Home({ onOpenInquiryModal }) {
 
                     {/* Large Subtle Background Watermark Number */}
                     <span
-                      className={`absolute right-4 font-serif font-bold text-white/[0.06] group-hover:text-[#C5A880]/[0.18] select-none pointer-events-none transition-all duration-700 ease-out group-hover:scale-105 group-hover:-translate-y-1 z-[1] ${
-                        isHero
+                      className={`absolute right-4 font-serif font-bold text-white/[0.06] group-hover:text-[#C5A880]/[0.18] select-none pointer-events-none transition-all duration-700 ease-out group-hover:scale-105 group-hover:-translate-y-1 z-[1] ${isHero
                           ? "bottom-4 text-8xl sm:text-9xl"
                           : "bottom-2 text-6xl sm:text-7xl"
-                      }`}
+                        }`}
                     >
                       {String(idx + 1).padStart(2, '0')}
                     </span>
@@ -831,16 +906,14 @@ export default function Home({ onOpenInquiryModal }) {
                         <div className="absolute -inset-0.5 rounded-full border-t border-r border-transparent group-hover:border-[#C5A880] transition-all duration-500 pointer-events-none" />
 
                         <div
-                          className={`rounded-2xl group-hover:rounded-full bg-[#121417]/70 backdrop-blur-md border border-[#C5A880]/45 text-[#C5A880] group-hover:bg-[#121417] group-hover:text-white group-hover:border-[#C5A880] flex items-center justify-center transition-all duration-500 shadow-lg ${
-                            isHero
+                          className={`rounded-2xl group-hover:rounded-full bg-[#121417]/70 backdrop-blur-md border border-[#C5A880]/45 text-[#C5A880] group-hover:bg-[#121417] group-hover:text-white group-hover:border-[#C5A880] flex items-center justify-center transition-all duration-500 shadow-lg ${isHero
                               ? "w-14 h-14 sm:w-16 sm:h-16"
                               : "w-11 h-11 sm:w-12 sm:h-12"
-                          }`}
+                            }`}
                         >
                           <Icon
-                            className={`transition-transform duration-500 group-hover:scale-110 ${
-                              isHero ? "w-7 h-7" : "w-5 h-5"
-                            }`}
+                            className={`transition-transform duration-500 group-hover:scale-110 ${isHero ? "w-7 h-7" : "w-5 h-5"
+                              }`}
                           />
                         </div>
                       </div>
@@ -850,11 +923,10 @@ export default function Home({ onOpenInquiryModal }) {
                     <div className="relative z-10 mt-6 space-y-2">
                       {/* Gold Accent Line that expands smoothly on hover */}
                       <div
-                        className={`h-[2px] bg-[#C5A880] transition-all duration-500 ease-out rounded-full ${
-                          isHero
+                        className={`h-[2px] bg-[#C5A880] transition-all duration-500 ease-out rounded-full ${isHero
                             ? "w-10 group-hover:w-20"
                             : "w-6 group-hover:w-12"
-                        }`}
+                          }`}
                       />
 
                       {/* Small Uppercase Curated Label */}
@@ -867,11 +939,10 @@ export default function Home({ onOpenInquiryModal }) {
 
                       {/* Title in White with High Contrast */}
                       <h3
-                        className={`font-serif font-bold text-white group-hover:text-[#C5A880] transition-colors duration-300 leading-snug drop-shadow-xs ${
-                          isHero
+                        className={`font-serif font-bold text-white group-hover:text-[#C5A880] transition-colors duration-300 leading-snug drop-shadow-xs ${isHero
                             ? "text-xl sm:text-2xl lg:text-3xl max-w-md"
                             : "text-sm sm:text-[15px]"
-                        }`}
+                          }`}
                       >
                         {item.title}
                       </h3>
@@ -1046,63 +1117,7 @@ export default function Home({ onOpenInquiryModal }) {
         </div>
       </section>
 
-      {/* 9. ARCH LOCATION DISCOVERY GRID */}
-      <section className="py-24 bg-[#FAF8F5]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-          <motion.div
-            variants={fadeUp}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-50px" }}
-            className="text-center max-w-3xl mx-auto mb-16"
-          >
-            <span className="text-xs uppercase tracking-[0.25em] text-[#C5A880] font-bold block mb-2">
-              Prime Locations
-            </span>
-            <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#121417]">
-              Explore Completed Projects by Area
-            </h2>
-            <p className="text-stone-600 text-xs sm:text-sm mt-2 font-light">
-              From oceanfront coastal corridors along ECR to discrete enclaves in Adyar and Anna Nagar.
-            </p>
-          </motion.div>
-
-          <motion.div
-            variants={staggerContainer(0.12, 0.1)}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-50px" }}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
-          >
-            {neighborhoods.map((n, idx) => (
-              <motion.div
-                key={idx}
-                variants={fadeUp}
-                whileHover={{ y: -8 }}
-                className="group relative aspect-[3/4] rounded-t-[120px] rounded-b-[32px] overflow-hidden cursor-pointer shadow-md hover:shadow-2xl border border-stone-200 bg-[#121417]"
-                onClick={() => navigate(`/properties?location=${encodeURIComponent(n.name)}`)}
-              >
-                <img
-                  src={n.image}
-                  alt={n.name}
-                  className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0E1013] via-[#0E1013]/30 to-transparent opacity-90 transition-opacity group-hover:opacity-80 pointer-events-none" />
-
-                <div className="absolute bottom-6 left-6 right-6 text-white space-y-1">
-                  <span className="text-[11px] uppercase tracking-widest text-[#C5A880] font-bold">
-                    {n.count}
-                  </span>
-                  <h3 className="font-serif text-xl font-bold">{n.name}</h3>
-                  <p className="text-xs text-stone-300 font-light opacity-90">{n.subtitle}</p>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-
-        </div>
-      </section>
 
       {/* 10. GRAND ARCHITECTURAL ENTRANCE CTA */}
       <section className="py-20 bg-[#FAF8F5] relative overflow-hidden">
