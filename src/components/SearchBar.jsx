@@ -1,9 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, MapPin, Home, DollarSign, Bed } from 'lucide-react';
-import { LOCATIONS, PROPERTY_TYPES } from '../data/properties';
 
-export default function SearchBar({ onSearch, initialValues = {} }) {
+export default function SearchBar({
+  onSearch,
+  initialValues = {},
+  locations = ['All Locations'],
+  propertyTypes = ['All Types'],
+  bedroomOptions = ['all'],
+  priceOptions = []
+}) {
   const navigate = useNavigate();
   const [location, setLocation] = useState(initialValues.location || 'All Locations');
   const [propertyType, setPropertyType] = useState(initialValues.propertyType || 'All Types');
@@ -49,7 +55,7 @@ export default function SearchBar({ onSearch, initialValues = {} }) {
     >
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         
-        {/* Location Dropdown */}
+        {/* Location Dropdown (Dynamic from database ongoing projects) */}
         <div className="flex flex-col space-y-1.5">
           <label className="text-[11px] uppercase tracking-widest text-[#C5A880] font-semibold flex items-center gap-1.5">
             <MapPin className="w-3.5 h-3.5" />
@@ -64,7 +70,7 @@ export default function SearchBar({ onSearch, initialValues = {} }) {
             }}
             className="w-full bg-white/5 border border-white/15 rounded-xs px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-[#C5A880] transition-colors cursor-pointer appearance-none"
           >
-            {LOCATIONS.map((loc) => (
+            {locations.map((loc) => (
               <option key={loc} value={loc} className="bg-[#121417] text-white">
                 {loc}
               </option>
@@ -72,7 +78,7 @@ export default function SearchBar({ onSearch, initialValues = {} }) {
           </select>
         </div>
 
-        {/* Property Type Dropdown */}
+        {/* Property Type Dropdown (Dynamic from database ongoing projects) */}
         <div className="flex flex-col space-y-1.5">
           <label className="text-[11px] uppercase tracking-widest text-[#C5A880] font-semibold flex items-center gap-1.5">
             <Home className="w-3.5 h-3.5" />
@@ -87,7 +93,7 @@ export default function SearchBar({ onSearch, initialValues = {} }) {
             }}
             className="w-full bg-white/5 border border-white/15 rounded-xs px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-[#C5A880] transition-colors cursor-pointer appearance-none"
           >
-            {PROPERTY_TYPES.map((type) => (
+            {propertyTypes.map((type) => (
               <option key={type} value={type} className="bg-[#121417] text-white">
                 {type}
               </option>
@@ -95,7 +101,7 @@ export default function SearchBar({ onSearch, initialValues = {} }) {
           </select>
         </div>
 
-        {/* Price Bracket Dropdown */}
+        {/* Price Bracket Dropdown (Dynamic based on database ongoing projects) */}
         <div className="flex flex-col space-y-1.5">
           <label className="text-[11px] uppercase tracking-widest text-[#C5A880] font-semibold flex items-center gap-1.5">
             <DollarSign className="w-3.5 h-3.5" />
@@ -111,13 +117,15 @@ export default function SearchBar({ onSearch, initialValues = {} }) {
             className="w-full bg-white/5 border border-white/15 rounded-xs px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-[#C5A880] transition-colors cursor-pointer appearance-none"
           >
             <option value="all" className="bg-[#121417] text-white">All Price Ranges</option>
-            <option value="under-10cr" className="bg-[#121417] text-white">Under ₹10 Cr</option>
-            <option value="10cr-20cr" className="bg-[#121417] text-white">₹10 Cr – ₹20 Cr</option>
-            <option value="above-20cr" className="bg-[#121417] text-white">Above ₹20 Cr</option>
+            {priceOptions.map((opt) => (
+              <option key={opt.value} value={opt.value} className="bg-[#121417] text-white">
+                {opt.label}
+              </option>
+            ))}
           </select>
         </div>
 
-        {/* Bedrooms Dropdown */}
+        {/* Bedrooms Dropdown (Dynamic from database ongoing projects) */}
         <div className="flex flex-col space-y-1.5">
           <label className="text-[11px] uppercase tracking-widest text-[#C5A880] font-semibold flex items-center gap-1.5">
             <Bed className="w-3.5 h-3.5" />
@@ -133,10 +141,13 @@ export default function SearchBar({ onSearch, initialValues = {} }) {
             className="w-full bg-white/5 border border-white/15 rounded-xs px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-[#C5A880] transition-colors cursor-pointer appearance-none"
           >
             <option value="all" className="bg-[#121417] text-white">Any Bedrooms</option>
-            <option value="3" className="bg-[#121417] text-white">3+ Bedrooms</option>
-            <option value="4" className="bg-[#121417] text-white">4+ Bedrooms</option>
-            <option value="5" className="bg-[#121417] text-white">5+ Bedrooms</option>
-            <option value="6" className="bg-[#121417] text-white">6+ Bedrooms</option>
+            {bedroomOptions
+              .filter((b) => b !== 'all')
+              .map((b) => (
+                <option key={b} value={b} className="bg-[#121417] text-white">
+                  {b} BHK
+                </option>
+              ))}
           </select>
         </div>
 
@@ -145,7 +156,7 @@ export default function SearchBar({ onSearch, initialValues = {} }) {
       {/* Submit Button */}
       <div className="mt-5 pt-4 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3">
         <span className="text-xs text-zinc-400">
-          Discover exclusive off-market coastal & metropolitan residences
+          Discover exclusive ongoing residential developments
         </span>
         <button
           type="submit"

@@ -6,7 +6,7 @@ import SearchBar from '../components/SearchBar';
 import PropertyFilters from '../components/PropertyFilters';
 import PropertyGrid from '../components/PropertyGrid';
 import { useFavorites } from '../context/FavoritesContext';
-import { getProjects, formatProjectForCarousel } from '../services/projectService';
+import { getOngoingProjects, formatProjectForCarousel, formatPriceShort } from '../services/projectService';
 
 export default function Properties() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -15,32 +15,119 @@ export default function Properties() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
-  const [allProperties, setAllProperties] = useState([]);
+  const [ongoingProperties, setOngoingProperties] = useState([]);
 
+  // 1. Fetch ONLY ongoing projects from the backend database
   useEffect(() => {
     let isMounted = true;
-    const fetchDatabaseProjects = async () => {
+    const fetchDatabaseOngoingProjects = async () => {
       try {
         setLoading(true);
         setError(null);
-        const projects = await getProjects();
+
+        // Fetch from ongoing endpoint
+        const projects = await getOngoingProjects();
         if (isMounted) {
-          const formatted = (projects || []).map(formatProjectForCarousel).filter(Boolean);
-          setAllProperties(formatted);
+          const raw = Array.isArray(projects) ? projects : [];
+
+          // STRICT FILTER: Ongoing status only. Completed projects must NEVER be loaded
+          const ongoingOnly = raw
+            .filter((p) => p.status?.toLowerCase() === 'ongoing')
+            .map(formatProjectForCarousel)
+            .filter(Boolean);
+
+          setOngoingProperties(ongoingOnly);
         }
       } catch (err) {
-        console.error("Failed to fetch database projects in Properties page:", err);
+        console.error("Failed to fetch ongoing projects in Properties page:", err);
         if (isMounted) {
-          setAllProperties([]);
-          setError("Unable to load properties from the database.");
+          setOngoingProperties([]);
+          setError("Unable to load properties. Please try again later.");
         }
       } finally {
         if (isMounted) setLoading(false);
       }
     };
-    fetchDatabaseProjects();
+
+    fetchDatabaseOngoingProjects();
     return () => { isMounted = false; };
   }, []);
+
+  // 2. DYNAMIC LOCATION OPTIONS (Generated ONLY from ongoing database projects)
+  const availableLocations = useMemo(() => {
+    const locSet = new Set();
+    ongoingProperties.forEach((p) => {
+      if (p.location && typeof p.location === 'string' && p.location.trim()) {
+        locSet.add(p.location.trim());
+      }
+    });
+    return ['All Locations', ...Array.from(locSet).sort()];
+  }, [ongoingProperties]);
+
+  // 3. DYNAMIC PROPERTY TYPE OPTIONS (Generated ONLY from ongoing database projects)
+  const availableTypes = useMemo(() => {
+    const typeSet = new Set();
+    ongoingProperties.forEach((p) => {
+      if (p.propertyType && typeof p.propertyType === 'string' && p.propertyType.trim()) {
+        typeSet.add(p.propertyType.trim());
+      }
+    });
+    return ['All Types', ...Array.from(typeSet).sort()];
+  }, [ongoingProperties]);
+
+  // 4. DYNAMIC BEDROOM OPTIONS (Generated ONLY from ongoing database projects)
+  const availableBedrooms = useMemo(() => {
+    const bedSet = new Set();
+    ongoingProperties.forEach((p) => {
+      if (p.bedrooms) {
+        const match = String(p.bedrooms).match(/\d+/);
+        if (match) {
+          bedSet.add(match[0]);
+        } else if (typeof p.bedrooms === 'string' && p.bedrooms.trim()) {
+          bedSet.add(p.bedrooms.trim());
+        }
+      }
+    });
+    const sorted = Array.from(bedSet).sort((a, b) => Number(a) - Number(b));
+    return ['all', ...sorted];
+  }, [ongoingProperties]);
+
+  // 5. DYNAMIC PRICE RANGE (Calculated ONLY from ongoing database projects)
+  const { minPrice, maxPrice } = useMemo(() => {
+    const prices = ongoingProperties
+      .map((p) => p.price)
+      .filter((p) => typeof p === 'number' && p > 0);
+
+    if (prices.length === 0) {
+      return { minPrice: 0, maxPrice: 100000000 };
+    }
+
+    const min = Math.min(...prices);
+    const max = Math.max(...prices);
+
+    return {
+      minPrice: min,
+      maxPrice: max === min ? max + 10000000 : max
+    };
+  }, [ongoingProperties]);
+
+  // Dynamic price brackets for search bar
+  const priceOptions = useMemo(() => {
+    const prices = ongoingProperties
+      .map((p) => p.price)
+      .filter((p) => typeof p === 'number' && p > 0)
+      .sort((a, b) => a - b);
+
+    if (prices.length <= 1) {
+      return [];
+    }
+
+    const median = prices[Math.floor(prices.length / 2)];
+    return [
+      { value: `under-${median}`, label: `Under ${formatPriceShort(median)}` },
+      { value: `above-${median}`, label: `Above ${formatPriceShort(median)}` }
+    ];
+  }, [ongoingProperties]);
 
   // Filters State
   const [filters, setFilters] = useState({
@@ -53,6 +140,13 @@ export default function Properties() {
     sortBy: 'featured',
     showFavoritesOnly: searchParams.get('favorites') === 'true'
   });
+
+  // Keep maxPrice in sync once projects load if not manually adjusted
+  useEffect(() => {
+    if (maxPrice > 0 && filters.maxPrice === 300000000) {
+      setFilters((prev) => ({ ...prev, maxPrice }));
+    }
+  }, [maxPrice]);
 
   // Sync query params when filters change from URL
   useEffect(() => {
@@ -97,7 +191,7 @@ export default function Properties() {
       location: 'All Locations',
       type: 'All Types',
       priceRange: 'all',
-      maxPrice: 300000000,
+      maxPrice,
       bedrooms: 'all',
       sortBy: 'featured',
       showFavoritesOnly: false
@@ -106,9 +200,9 @@ export default function Properties() {
     setTimeout(() => setLoading(false), 200);
   };
 
-  // Filtered Properties Computation
+  // 6. FILTER ONGOING DATASET
   const filteredProperties = useMemo(() => {
-    let result = [...allProperties];
+    let result = [...ongoingProperties];
 
     if (filters.showFavoritesOnly) {
       result = result.filter((p) => favorites.includes(p.id));
@@ -142,24 +236,29 @@ export default function Properties() {
       );
     }
 
-    // Price Bracket Filtering
-    if (filters.priceRange === 'under-10cr') {
-      result = result.filter((p) => p.price < 100000000);
-    } else if (filters.priceRange === '10cr-20cr') {
-      result = result.filter((p) => p.price >= 100000000 && p.price <= 200000000);
-    } else if (filters.priceRange === 'above-20cr') {
-      result = result.filter((p) => p.price > 200000000);
-    } else {
-      if (filters.maxPrice < 300000000) {
-        result = result.filter((p) => p.price <= filters.maxPrice || p.price === 0);
+    // Dynamic price filtering
+    if (filters.priceRange && filters.priceRange !== 'all') {
+      if (filters.priceRange.startsWith('under-')) {
+        const threshold = Number(filters.priceRange.replace('under-', ''));
+        if (!isNaN(threshold)) {
+          result = result.filter((p) => p.price <= threshold);
+        }
+      } else if (filters.priceRange.startsWith('above-')) {
+        const threshold = Number(filters.priceRange.replace('above-', ''));
+        if (!isNaN(threshold)) {
+          result = result.filter((p) => p.price >= threshold);
+        }
       }
+    } else if (filters.maxPrice) {
+      result = result.filter((p) => p.price <= filters.maxPrice || p.price === 0);
     }
 
+    // Dynamic bedroom filtering
     if (filters.bedrooms !== 'all') {
-      const minBeds = parseInt(filters.bedrooms, 10);
+      const targetBeds = String(filters.bedrooms);
       result = result.filter((p) => {
-        const bedVal = parseInt(String(p.bedrooms).replace(/[^0-9]/g, ''), 10);
-        return isNaN(bedVal) ? true : bedVal >= minBeds;
+        const bedVal = String(p.bedrooms).match(/\d+/);
+        return bedVal ? bedVal[0] === targetBeds || Number(bedVal[0]) >= Number(targetBeds) : true;
       });
     }
 
@@ -175,7 +274,15 @@ export default function Properties() {
     }
 
     return result;
-  }, [filters, favorites, allProperties]);
+  }, [filters, favorites, ongoingProperties]);
+
+  // 7. COMPLETED PROJECTS FINAL SAFETY CHECK
+  // Even if any non-ongoing project somehow passed, strictly exclude it here
+  const visibleProperties = useMemo(() => {
+    return filteredProperties.filter(
+      (project) => project.status?.toLowerCase() === 'ongoing'
+    );
+  }, [filteredProperties]);
 
   return (
     <div className="min-h-screen bg-[#FAF8F5]/80 backdrop-blur-xs pt-24 pb-20">
@@ -186,15 +293,15 @@ export default function Properties() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6 relative z-10">
           <div>
             <span className="text-xs uppercase tracking-[0.25em] text-[#C5A880] font-bold block mb-2">
-              COMPLETED & ONGOING PORTFOLIO
+              ONGOING DEVELOPMENTS PORTFOLIO
             </span>
             <h1 className="font-serif text-4xl sm:text-5xl font-bold tracking-tight uppercase">
-              {filters.showFavoritesOnly ? 'Your Saved Residences' : 'Explore Luxury Residences'}
+              {filters.showFavoritesOnly ? 'Your Saved Residences' : 'Ongoing Luxury Developments'}
             </h1>
             <p className="text-stone-300 text-sm max-w-xl mx-auto mt-3 font-light leading-relaxed">
               {filters.showFavoritesOnly
                 ? `Reviewing your ${favorites.length} saved shortlisted properties.`
-                : 'Browse completed ready-to-move apartments, oceanfront residences, and upcoming flagship developments.'}
+                : 'Browse our latest ongoing residential projects currently under active development.'}
             </p>
           </div>
 
@@ -202,6 +309,10 @@ export default function Properties() {
           <div className="pt-2">
             <SearchBar
               onSearch={handleSearchFromBar}
+              locations={availableLocations}
+              propertyTypes={availableTypes}
+              bedroomOptions={availableBedrooms}
+              priceOptions={priceOptions}
               initialValues={{
                 location: filters.location,
                 propertyType: filters.type,
@@ -220,7 +331,7 @@ export default function Properties() {
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8 pb-4 border-b border-stone-200">
           <div className="flex items-center gap-3">
             <span className="text-sm font-serif font-bold text-[#121417]">
-              Showing {filteredProperties.length} Luxury Residences
+              Showing {visibleProperties.length} Ongoing Development{visibleProperties.length !== 1 ? 's' : ''}
             </span>
             {filters.showFavoritesOnly && (
               <span className="px-2.5 py-0.5 bg-rose-500/10 text-rose-600 text-xs font-semibold rounded-full flex items-center gap-1">
@@ -237,7 +348,7 @@ export default function Properties() {
               className="lg:hidden flex-1 sm:flex-none px-4 py-2.5 bg-[#121417] text-white text-xs uppercase tracking-wider font-bold rounded-xs flex items-center justify-center gap-2"
             >
               <SlidersHorizontal className="w-4 h-4 text-[#C5A880]" />
-              <span>More Filters ({filteredProperties.length})</span>
+              <span>More Filters ({visibleProperties.length})</span>
             </button>
           </div>
         </div>
@@ -252,7 +363,12 @@ export default function Properties() {
                 filters={filters}
                 onChange={handleFilterChange}
                 onReset={handleReset}
-                totalResults={filteredProperties.length}
+                totalResults={visibleProperties.length}
+                locations={availableLocations}
+                propertyTypes={availableTypes}
+                bedroomOptions={availableBedrooms}
+                minPrice={minPrice}
+                maxPrice={maxPrice}
               />
             </div>
           </div>
@@ -260,9 +376,10 @@ export default function Properties() {
           {/* Property Grid Results */}
           <div className="lg:col-span-3">
             <PropertyGrid
-              properties={filteredProperties}
+              properties={visibleProperties}
               loading={loading}
               error={error}
+              totalOngoingCount={ongoingProperties.length}
               onResetFilters={handleReset}
             />
           </div>
@@ -290,7 +407,12 @@ export default function Properties() {
                 filters={filters}
                 onChange={handleFilterChange}
                 onReset={handleReset}
-                totalResults={filteredProperties.length}
+                totalResults={visibleProperties.length}
+                locations={availableLocations}
+                propertyTypes={availableTypes}
+                bedroomOptions={availableBedrooms}
+                minPrice={minPrice}
+                maxPrice={maxPrice}
                 isMobileDrawer={true}
                 onCloseDrawer={() => setMobileFilterOpen(false)}
               />

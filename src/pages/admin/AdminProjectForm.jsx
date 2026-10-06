@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Upload, Image as ImageIcon, Save, AlertCircle, RefreshCw, FileText, X, Check } from 'lucide-react';
-import { createProject, updateProject, getProjectById, getImageUrl } from '../../services/projectService';
+import { createProject, updateProject, getProjectById, getImageUrl, downloadBrochure } from '../../services/projectService';
 
 export default function AdminProjectForm({ isEdit = false }) {
   const navigate = useNavigate();
@@ -62,8 +62,8 @@ export default function AdminProjectForm({ isEdit = false }) {
           }
           setExistingImagesList(allExisting);
 
-          if (project.brochureUrl) {
-            setExistingBrochureUrl(getImageUrl(project.brochureUrl));
+          if (project.brochureUrl || project.hasBrochure || project.brochure?.filename) {
+            setExistingBrochureUrl(project.brochureUrl ? getImageUrl(project.brochureUrl) : 'has-brochure');
           }
         } catch (err) {
           console.error(err);
@@ -502,14 +502,13 @@ export default function AdminProjectForm({ isEdit = false }) {
                       <span className="text-[11px] text-zinc-500">Select a new PDF below if you want to replace it</span>
                     </div>
                   </div>
-                  <a
-                    href={existingBrochureUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-3 py-1.5 bg-white border border-stone-300 text-xs font-semibold text-zinc-700 rounded-xs hover:border-[#C5A880] transition-colors"
+                  <button
+                    type="button"
+                    onClick={() => downloadBrochure(id)}
+                    className="px-3 py-1.5 bg-white border border-stone-300 text-xs font-semibold text-zinc-700 rounded-xs hover:border-[#C5A880] transition-colors cursor-pointer"
                   >
-                    View PDF
-                  </a>
+                    Download Current PDF
+                  </button>
                 </div>
               )}
 

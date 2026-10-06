@@ -1,15 +1,23 @@
 import React from 'react';
 import { Search, RotateCcw, X, SlidersHorizontal } from 'lucide-react';
-import { LOCATIONS, PROPERTY_TYPES } from '../data/properties';
+import { formatPriceShort } from '../services/projectService';
 
 export default function PropertyFilters({
   filters,
   onChange,
   onReset,
   totalResults,
+  locations = ['All Locations'],
+  propertyTypes = ['All Types'],
+  bedroomOptions = ['all'],
+  minPrice = 0,
+  maxPrice = 100000000,
   isMobileDrawer = false,
   onCloseDrawer
 }) {
+  const currentMaxPrice = filters.maxPrice || maxPrice;
+  const sliderStep = Math.max(50000, Math.round((maxPrice - minPrice) / 20) || 50000);
+
   return (
     <div className={`space-y-6 ${isMobileDrawer ? '' : 'bg-white p-6 rounded-xs border border-stone-200/80 shadow-sm'}`}>
       
@@ -45,7 +53,7 @@ export default function PropertyFilters({
           <Search className="w-4 h-4 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
-            placeholder="Villa, ECR, Penthouse..."
+            placeholder="Search ongoing projects..."
             value={filters.search}
             onChange={(e) => onChange('search', e.target.value)}
             className="w-full pl-9 pr-3 py-2 bg-[#FAF8F5] border border-stone-200 rounded-xs text-sm text-[#121417] focus:outline-none focus:border-[#C5A880]"
@@ -53,7 +61,7 @@ export default function PropertyFilters({
         </div>
       </div>
 
-      {/* 2. Location */}
+      {/* 2. Location (Generated dynamically from database ongoing projects) */}
       <div className="space-y-2">
         <label className="text-xs font-semibold uppercase tracking-wider text-zinc-600">Location</label>
         <select
@@ -61,13 +69,13 @@ export default function PropertyFilters({
           onChange={(e) => onChange('location', e.target.value)}
           className="w-full px-3 py-2 bg-[#FAF8F5] border border-stone-200 rounded-xs text-sm text-[#121417] focus:outline-none focus:border-[#C5A880] cursor-pointer"
         >
-          {LOCATIONS.map((loc) => (
+          {locations.map((loc) => (
             <option key={loc} value={loc}>{loc}</option>
           ))}
         </select>
       </div>
 
-      {/* 3. Property Type */}
+      {/* 3. Property Type (Generated dynamically from database ongoing projects) */}
       <div className="space-y-2">
         <label className="text-xs font-semibold uppercase tracking-wider text-zinc-600">Property Type</label>
         <select
@@ -75,49 +83,49 @@ export default function PropertyFilters({
           onChange={(e) => onChange('type', e.target.value)}
           className="w-full px-3 py-2 bg-[#FAF8F5] border border-stone-200 rounded-xs text-sm text-[#121417] focus:outline-none focus:border-[#C5A880] cursor-pointer"
         >
-          {PROPERTY_TYPES.map((t) => (
+          {propertyTypes.map((t) => (
             <option key={t} value={t}>{t}</option>
           ))}
         </select>
       </div>
 
-      {/* 4. Price Bracket Slider */}
+      {/* 4. Price Bracket Slider (Calculated dynamically from database ongoing projects) */}
       <div className="space-y-3">
         <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-zinc-600">
           <span>Max Price</span>
-          <span className="text-[#C5A880]">₹{(filters.maxPrice / 10000000).toFixed(1)} Cr</span>
+          <span className="text-[#C5A880] font-bold">{formatPriceShort(currentMaxPrice)}</span>
         </div>
         <input
           type="range"
-          min="50000000"
-          max="300000000"
-          step="10000000"
-          value={filters.maxPrice}
+          min={minPrice}
+          max={maxPrice}
+          step={sliderStep}
+          value={currentMaxPrice}
           onChange={(e) => onChange('maxPrice', Number(e.target.value))}
           className="w-full accent-[#C5A880] cursor-pointer"
         />
         <div className="flex justify-between text-[10px] text-zinc-400">
-          <span>₹5 Cr</span>
-          <span>₹30 Cr</span>
+          <span>{formatPriceShort(minPrice)}</span>
+          <span>{formatPriceShort(maxPrice)}</span>
         </div>
       </div>
 
-      {/* 5. Bedrooms */}
+      {/* 5. Bedrooms (Contains ONLY bedroom options present in database ongoing projects) */}
       <div className="space-y-2">
-        <label className="text-xs font-semibold uppercase tracking-wider text-zinc-600">Minimum Bedrooms</label>
-        <div className="grid grid-cols-5 gap-1.5">
-          {['all', '3', '4', '5', '6'].map((b) => (
+        <label className="text-xs font-semibold uppercase tracking-wider text-zinc-600">Bedrooms</label>
+        <div className="flex flex-wrap gap-1.5">
+          {bedroomOptions.map((b) => (
             <button
               key={b}
               type="button"
               onClick={() => onChange('bedrooms', b)}
-              className={`py-2 text-xs font-medium rounded-xs border transition-all cursor-pointer ${
+              className={`px-3 py-2 text-xs font-medium rounded-xs border transition-all cursor-pointer ${
                 filters.bedrooms === b
                   ? 'bg-[#121417] text-white border-[#121417]'
                   : 'bg-[#FAF8F5] text-zinc-600 border-stone-200 hover:border-[#C5A880]'
               }`}
             >
-              {b === 'all' ? 'Any' : `${b}+`}
+              {b === 'all' ? 'Any' : `${b} BHK`}
             </button>
           ))}
         </div>

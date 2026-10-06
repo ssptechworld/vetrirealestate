@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Heart, Menu, X, Calendar, ChevronRight, Sparkles } from 'lucide-react';
 import { useFavorites } from '../context/FavoritesContext';
+import logo from '../assets/logo.png';
 
 export default function Navbar({ onOpenInquiryModal }) {
   const [scrolled, setScrolled] = useState(false);
@@ -48,9 +49,13 @@ export default function Navbar({ onOpenInquiryModal }) {
         <div className={`transition-all duration-500 flex items-center justify-between ${navbarBg}`}>
 
           {/* Brand Logo */}
-          <Link to="/" className="group flex items-center gap-2.5">
-            <div className="w-9 h-9 border border-[#C5A880]/80 bg-[#121417] flex items-center justify-center rounded-full transition-all duration-500 group-hover:border-[#C5A880] group-hover:scale-105 shadow-md">
-              <span className="text-[#C5A880] font-serif font-bold text-xs tracking-tighter">V V</span>
+          <Link to="/" className="group flex items-center gap-3">
+            <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full overflow-hidden border border-[#C5A880]/70 bg-[#121417] shadow-md flex items-center justify-center shrink-0 transition-all duration-500 group-hover:scale-105 group-hover:border-[#C5A880]">
+              <img
+                src={logo}
+                alt="Vetri Vetrivel Construction"
+                className="w-full h-full rounded-full object-cover"
+              />
             </div>
             <div className="flex flex-col">
               <span className="font-serif text-base sm:text-lg font-bold tracking-[0.2em] text-white uppercase leading-none">

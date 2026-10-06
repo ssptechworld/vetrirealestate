@@ -2,19 +2,27 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import PropertyCard from './PropertyCard';
 import { staggerContainer } from '../utils/animations';
-import { SearchX, RefreshCw } from 'lucide-react';
+import { SearchX, RefreshCw, Building, AlertCircle } from 'lucide-react';
 
-export default function PropertyGrid({ properties, loading, error, onResetFilters }) {
+export default function PropertyGrid({
+  properties,
+  loading,
+  error,
+  totalOngoingCount = 0,
+  onResetFilters
+}) {
   if (loading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {[1, 2, 3, 4, 5, 6].map((idx) => (
-          <div key={idx} className="bg-white rounded-xs border border-stone-200 p-4 space-y-4 animate-pulse">
-            <div className="w-full aspect-[4/3] bg-stone-200 rounded-xs" />
-            <div className="h-4 bg-stone-200 rounded w-1/3" />
-            <div className="h-6 bg-stone-200 rounded w-3/4" />
-            <div className="h-10 bg-stone-200 rounded w-full" />
-            <div className="h-8 bg-stone-200 rounded w-full" />
+          <div key={idx} className="bg-white rounded-[32px] sm:rounded-[38px] p-5 border border-stone-200/80 shadow-xs animate-pulse space-y-4">
+            <div className="w-full aspect-[4/3] bg-stone-200/80 rounded-[28px]" />
+            <div className="p-2 space-y-3">
+              <div className="h-3 bg-stone-200/60 rounded-full w-1/3" />
+              <div className="h-5 bg-stone-200/80 rounded-full w-3/4" />
+              <div className="h-9 bg-stone-100 rounded-full w-full mt-4" />
+              <div className="h-10 bg-stone-200/60 rounded-full w-full mt-2" />
+            </div>
           </div>
         ))}
       </div>
@@ -26,30 +34,50 @@ export default function PropertyGrid({ properties, loading, error, onResetFilter
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white border border-stone-200/80 rounded-xs p-12 text-center flex flex-col items-center justify-center space-y-4 my-8"
+        className="bg-white border border-stone-200/80 rounded-[32px] p-12 text-center flex flex-col items-center justify-center space-y-4 my-8 shadow-xs"
       >
-        <div className="w-16 h-16 rounded-full bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-600">
-          <SearchX className="w-8 h-8" />
+        <div className="w-14 h-14 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-700">
+          <AlertCircle className="w-7 h-7" />
         </div>
-        <h3 className="font-serif text-2xl font-bold text-[#121417]">Error Loading Database Properties</h3>
-        <p className="text-zinc-500 text-sm max-w-md">{error}</p>
+        <h3 className="font-serif text-2xl font-bold text-[#121417]">Unable to load properties.</h3>
+        <p className="text-zinc-500 text-sm max-w-md font-light">Please try again later.</p>
       </motion.div>
     );
   }
 
   if (!properties || properties.length === 0) {
+    // Zero ongoing projects in database
+    if (totalOngoingCount === 0) {
+      return (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white border border-stone-200/80 rounded-[32px] p-16 text-center flex flex-col items-center justify-center space-y-4 my-8 shadow-xs"
+        >
+          <div className="w-16 h-16 rounded-full bg-[#FAF8F5] border border-[#C5A880]/30 flex items-center justify-center text-[#C5A880]">
+            <Building className="w-8 h-8" />
+          </div>
+          <h3 className="font-serif text-2xl font-bold text-[#121417]">No Ongoing Properties Available</h3>
+          <p className="text-zinc-500 text-sm max-w-md font-light">
+            New properties will be listed here soon.
+          </p>
+        </motion.div>
+      );
+    }
+
+    // Ongoing projects exist, but current active filters returned 0 matches
     return (
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white border border-stone-200/80 rounded-xs p-12 text-center flex flex-col items-center justify-center space-y-4 my-8"
+        className="bg-white border border-stone-200/80 rounded-[32px] p-16 text-center flex flex-col items-center justify-center space-y-4 my-8 shadow-xs"
       >
         <div className="w-16 h-16 rounded-full bg-[#FAF8F5] border border-[#C5A880]/30 flex items-center justify-center text-[#C5A880]">
           <SearchX className="w-8 h-8" />
         </div>
-        <h3 className="font-serif text-2xl font-bold text-[#121417]">No Matching Estates Found</h3>
-        <p className="text-zinc-500 text-sm max-w-md">
-          We could not find any luxury properties matching your exact criteria. Try adjusting your filters or price range.
+        <h3 className="font-serif text-2xl font-bold text-[#121417]">No Matching Ongoing Properties Found</h3>
+        <p className="text-zinc-500 text-sm max-w-md font-light">
+          We could not find any ongoing properties matching your current filter criteria. Try adjusting your filters or price range.
         </p>
         {onResetFilters && (
           <button

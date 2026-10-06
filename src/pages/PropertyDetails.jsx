@@ -24,7 +24,7 @@ import AmenitiesList from '../components/AmenitiesList';
 import PropertyCard from '../components/PropertyCard';
 import { PROPERTIES_DATA } from '../data/properties';
 import { useFavorites } from '../context/FavoritesContext';
-import { getProjectById, formatProjectForCarousel } from '../services/projectService';
+import { getProjectById, formatProjectForCarousel, downloadBrochure } from '../services/projectService';
 import buildingVideo from '../assets/Building.mp4';
 
 export default function PropertyDetails({ onOpenInquiryModal }) {
@@ -35,6 +35,24 @@ export default function PropertyDetails({ onOpenInquiryModal }) {
   const [copied, setCopied] = useState(false);
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [downloadingBrochure, setDownloadingBrochure] = useState(false);
+
+  const handleDownloadBrochure = async (e) => {
+    if (e) e.preventDefault();
+    if (!property?.id || downloadingBrochure) return;
+    try {
+      setDownloadingBrochure(true);
+      await downloadBrochure(
+        property.id,
+        property.brochureFilename || `${(property.title || 'project').toLowerCase().replace(/[^a-z0-9]/g, '-')}-brochure.pdf`
+      );
+    } catch (err) {
+      console.error('Failed to download brochure:', err);
+      alert('Brochure download failed: ' + (err.message || 'File not found'));
+    } finally {
+      setDownloadingBrochure(false);
+    }
+  };
 
   // Build / Construction Video Controls State
   const [isBuildVideoMuted, setIsBuildVideoMuted] = useState(true);
@@ -193,16 +211,17 @@ export default function PropertyDetails({ onOpenInquiryModal }) {
                 <span className="font-medium text-zinc-700">{property.location || property.areaName}</span>
               </div>
 
-              {property.brochureUrl && (
-                <a
-                  href={property.brochureUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-xs font-bold text-[#C5A880] hover:text-[#b5966c] uppercase tracking-wider transition-colors"
+              {(property.hasBrochure || property.brochureUrl) && (
+                <button
+                  type="button"
+                  onClick={handleDownloadBrochure}
+                  disabled={downloadingBrochure}
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-[#C5A880] hover:text-[#b5966c] uppercase tracking-wider transition-colors cursor-pointer disabled:opacity-50"
+                  title="Download Project Brochure"
                 >
                   <FileText className="w-4 h-4" />
-                  <span>Download Brochure</span>
-                </a>
+                  <span>{downloadingBrochure ? 'Downloading...' : 'Download Brochure'}</span>
+                </button>
               )}
             </div>
           </div>
@@ -352,16 +371,16 @@ export default function PropertyDetails({ onOpenInquiryModal }) {
                   <span>WhatsApp Advisor</span>
                 </a>
 
-                {property.brochureUrl && (
-                  <a
-                    href={property.brochureUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full py-3.5 bg-[#FAF8F5] hover:bg-[#C5A880] hover:text-[#0E1013] text-[#0E1013] border border-[#C5A880]/50 text-xs font-bold uppercase tracking-widest rounded-full transition-colors flex items-center justify-center gap-2 shadow-sm"
+                {(property.hasBrochure || property.brochureUrl) && (
+                  <button
+                    type="button"
+                    onClick={handleDownloadBrochure}
+                    disabled={downloadingBrochure}
+                    className="w-full py-3.5 bg-[#FAF8F5] hover:bg-[#C5A880] hover:text-[#0E1013] text-[#0E1013] border border-[#C5A880]/50 text-xs font-bold uppercase tracking-widest rounded-full transition-colors flex items-center justify-center gap-2 shadow-sm cursor-pointer disabled:opacity-50"
                   >
                     <FileText className="w-4 h-4 text-[#C5A880]" />
-                    <span>Download Brochure</span>
-                  </a>
+                    <span>{downloadingBrochure ? 'Downloading...' : 'Download Brochure'}</span>
+                  </button>
                 )}
               </div>
 
@@ -414,16 +433,16 @@ export default function PropertyDetails({ onOpenInquiryModal }) {
         </div>
 
         <div className="flex items-center gap-2">
-          {property.brochureUrl && (
-            <a
-              href={property.brochureUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-3 bg-white/10 hover:bg-[#C5A880] text-[#C5A880] hover:text-[#0E1013] border border-white/20 rounded-full transition-colors"
+          {(property.hasBrochure || property.brochureUrl) && (
+            <button
+              type="button"
+              onClick={handleDownloadBrochure}
+              disabled={downloadingBrochure}
+              className="p-3 bg-white/10 hover:bg-[#C5A880] text-[#C5A880] hover:text-[#0E1013] border border-white/20 rounded-full transition-colors cursor-pointer disabled:opacity-50"
               title="Download Brochure"
             >
               <FileText className="w-4 h-4" />
-            </a>
+            </button>
           )}
 
           <a

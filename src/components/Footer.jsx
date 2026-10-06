@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Share2, Globe, Compass } from 'lucide-react';
+import logo from '../assets/logo.png';
 
 export default function Footer() {
   const [subscribed, setSubscribed] = useState(false);
@@ -38,15 +39,19 @@ export default function Footer() {
 
           {/* Col 1: Brand Info */}
           <div className="lg:col-span-2 flex flex-col space-y-6">
-            <Link to="/" className="flex items-center gap-3">
-              <div className="w-10 h-10 border border-[#C5A880] flex items-center justify-center rounded-full bg-[#0E1013] shadow-md">
-                <span className="text-[#C5A880] font-serif font-bold text-sm">V V</span>
+            <Link to="/" className="flex items-center gap-3 group">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full overflow-hidden border border-[#C5A880]/70 bg-[#121417] shadow-lg flex items-center justify-center shrink-0 transition-all duration-500 group-hover:scale-105 group-hover:border-[#C5A880]">
+                <img
+                  src={logo}
+                  alt="Vetri Vetrivel Construction"
+                  className="w-full h-full rounded-full object-cover"
+                />
               </div>
               <div className="flex flex-col">
-                <span className="font-serif text-xl font-bold tracking-[0.2em] text-white uppercase">
+                <span className="font-serif text-xl font-bold tracking-[0.2em] text-white uppercase leading-none">
                   VV
                 </span>
-                <span className="text-[9px] tracking-[0.25em] text-[#C5A880] uppercase -mt-1 font-semibold">
+                <span className="text-[9px] tracking-[0.25em] text-[#C5A880] uppercase mt-0.5 font-semibold">
                   CONSTRUCTION
                 </span>
               </div>
