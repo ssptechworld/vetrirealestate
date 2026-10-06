@@ -46,7 +46,7 @@ export default function Navbar({ onOpenInquiryModal }) {
     <>
       <header className="fixed top-0 left-0 right-0 z-50 px-4 transition-all duration-500">
         <div className={`transition-all duration-500 flex items-center justify-between ${navbarBg}`}>
-          
+
           {/* Brand Logo */}
           <Link to="/" className="group flex items-center gap-2.5">
             <div className="w-9 h-9 border border-[#C5A880]/80 bg-[#121417] flex items-center justify-center rounded-full transition-all duration-500 group-hover:border-[#C5A880] group-hover:scale-105 shadow-md">
@@ -54,10 +54,10 @@ export default function Navbar({ onOpenInquiryModal }) {
             </div>
             <div className="flex flex-col">
               <span className="font-serif text-base sm:text-lg font-bold tracking-[0.2em] text-white uppercase leading-none">
-                VETRI VEL
+                VV
               </span>
               <span className="text-[8px] tracking-[0.3em] text-[#C5A880] uppercase mt-0.5 font-semibold">
-                REAL ESTATE
+                CONSTRUCTION
               </span>
             </div>
           </Link>
@@ -70,9 +70,8 @@ export default function Navbar({ onOpenInquiryModal }) {
                 <Link
                   key={link.name}
                   to={link.path}
-                  className={`text-xs tracking-[0.2em] uppercase transition-all duration-300 relative py-1 font-semibold ${
-                    isActive ? 'text-[#C5A880]' : 'text-stone-300 hover:text-white'
-                  }`}
+                  className={`text-xs tracking-[0.2em] uppercase transition-all duration-300 relative py-1 font-semibold ${isActive ? 'text-[#C5A880]' : 'text-stone-300 hover:text-white'
+                    }`}
                 >
                   {link.name}
                   {isActive && (
@@ -159,11 +158,10 @@ export default function Navbar({ onOpenInquiryModal }) {
                 <Link
                   key={link.name}
                   to={link.path}
-                  className={`text-lg tracking-[0.2em] uppercase py-2.5 border-b border-white/10 ${
-                    location.pathname === link.path
-                      ? 'text-[#C5A880] font-bold'
-                      : 'text-stone-300'
-                  }`}
+                  className={`text-lg tracking-[0.2em] uppercase py-2.5 border-b border-white/10 ${location.pathname === link.path
+                    ? 'text-[#C5A880] font-bold'
+                    : 'text-stone-300'
+                    }`}
                 >
                   {link.name}
                 </Link>
@@ -184,7 +182,7 @@ export default function Navbar({ onOpenInquiryModal }) {
             </div>
 
             <div className="text-center text-[10px] text-stone-500 uppercase tracking-widest pt-8 border-t border-white/10">
-              © {new Date().getFullYear()} Vetri Vel Real Estate. Premium Living.
+              © {new Date().getFullYear()} VV CONSTRUCTION. Premium Living.
             </div>
           </motion.div>
         )}

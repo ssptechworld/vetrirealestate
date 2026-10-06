@@ -44,10 +44,10 @@ export default function Footer() {
               </div>
               <div className="flex flex-col">
                 <span className="font-serif text-xl font-bold tracking-[0.2em] text-white uppercase">
-                  VETRI VEL
+                  VV
                 </span>
                 <span className="text-[9px] tracking-[0.25em] text-[#C5A880] uppercase -mt-1 font-semibold">
-                  REAL ESTATE
+                  CONSTRUCTION
                 </span>
               </div>
             </Link>
@@ -139,7 +139,7 @@ export default function Footer() {
 
         {/* Bottom Bar */}
         <div className="pt-8 flex flex-col md:flex-row items-center justify-between text-xs text-zinc-500 gap-4 font-light">
-          <p>© {new Date().getFullYear()} Vetri Vel Real Estate Private Limited. All Rights Reserved.</p>
+          <p>© {new Date().getFullYear()} VV Construction Private Limited. All Rights Reserved.</p>
           <div className="flex items-center space-x-6">
             <a href="#privacy" className="hover:text-zinc-300 transition-colors">Privacy Policy</a>
             <a href="#terms" className="hover:text-zinc-300 transition-colors">Terms of Representation</a>
