@@ -128,7 +128,7 @@ export default function Contact() {
   };
 
   const office = {
-    name: "Vetri Vel Real Estate Head Office",
+    name: "SASTHA FOUNDATION Head Office",
     address: "No. 16, Santro City, Chembarambakkam, Chennai - 600123",
     phone: "+91 93800 05934",
     email: "concierge@vetrivelrealestate.com",

@@ -6,7 +6,12 @@ import SearchBar from '../components/SearchBar';
 import PropertyFilters from '../components/PropertyFilters';
 import PropertyGrid from '../components/PropertyGrid';
 import { useFavorites } from '../context/FavoritesContext';
-import { getOngoingProjects, formatProjectForCarousel, formatPriceShort } from '../services/projectService';
+import {
+  getProjects,
+  formatProjectForCarousel,
+  generatePriceBrackets,
+  projectMatchesPriceBracket
+} from '../services/projectService';
 
 export default function Properties() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -15,33 +20,26 @@ export default function Properties() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
-  const [ongoingProperties, setOngoingProperties] = useState([]);
+  const [allProjects, setAllProjects] = useState([]);
 
-  // 1. Fetch ONLY ongoing projects from the backend database
+  // 1. Fetch real projects from the backend database
   useEffect(() => {
     let isMounted = true;
-    const fetchDatabaseOngoingProjects = async () => {
+    const fetchDatabaseProjects = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        // Fetch from ongoing endpoint
-        const projects = await getOngoingProjects();
+        const data = await getProjects();
         if (isMounted) {
-          const raw = Array.isArray(projects) ? projects : [];
-
-          // STRICT FILTER: Ongoing status only. Completed projects must NEVER be loaded
-          const ongoingOnly = raw
-            .filter((p) => p.status?.toLowerCase() === 'ongoing')
-            .map(formatProjectForCarousel)
-            .filter(Boolean);
-
-          setOngoingProperties(ongoingOnly);
+          const raw = Array.isArray(data) ? data : [];
+          const formatted = raw.map(formatProjectForCarousel).filter(Boolean);
+          setAllProjects(formatted);
         }
       } catch (err) {
-        console.error("Failed to fetch ongoing projects in Properties page:", err);
+        console.error("Failed to fetch database projects in Properties page:", err);
         if (isMounted) {
-          setOngoingProperties([]);
+          setAllProjects([]);
           setError("Unable to load properties. Please try again later.");
         }
       } finally {
@@ -49,36 +47,36 @@ export default function Properties() {
       }
     };
 
-    fetchDatabaseOngoingProjects();
+    fetchDatabaseProjects();
     return () => { isMounted = false; };
   }, []);
 
-  // 2. DYNAMIC LOCATION OPTIONS (Generated ONLY from ongoing database projects)
+  // 2. DYNAMIC LOCATION OPTIONS (Generated from real database projects)
   const availableLocations = useMemo(() => {
     const locSet = new Set();
-    ongoingProperties.forEach((p) => {
+    allProjects.forEach((p) => {
       if (p.location && typeof p.location === 'string' && p.location.trim()) {
         locSet.add(p.location.trim());
       }
     });
     return ['All Locations', ...Array.from(locSet).sort()];
-  }, [ongoingProperties]);
+  }, [allProjects]);
 
-  // 3. DYNAMIC PROPERTY TYPE OPTIONS (Generated ONLY from ongoing database projects)
+  // 3. DYNAMIC PROPERTY TYPE OPTIONS (Generated from real database projects)
   const availableTypes = useMemo(() => {
     const typeSet = new Set();
-    ongoingProperties.forEach((p) => {
+    allProjects.forEach((p) => {
       if (p.propertyType && typeof p.propertyType === 'string' && p.propertyType.trim()) {
         typeSet.add(p.propertyType.trim());
       }
     });
     return ['All Types', ...Array.from(typeSet).sort()];
-  }, [ongoingProperties]);
+  }, [allProjects]);
 
-  // 4. DYNAMIC BEDROOM OPTIONS (Generated ONLY from ongoing database projects)
+  // 4. DYNAMIC BEDROOM OPTIONS (Generated from real database projects)
   const availableBedrooms = useMemo(() => {
     const bedSet = new Set();
-    ongoingProperties.forEach((p) => {
+    allProjects.forEach((p) => {
       if (p.bedrooms) {
         const match = String(p.bedrooms).match(/\d+/);
         if (match) {
@@ -90,48 +88,36 @@ export default function Properties() {
     });
     const sorted = Array.from(bedSet).sort((a, b) => Number(a) - Number(b));
     return ['all', ...sorted];
-  }, [ongoingProperties]);
+  }, [allProjects]);
 
-  // 5. DYNAMIC PRICE RANGE (Calculated ONLY from ongoing database projects)
+  // 5. DYNAMIC PRICE RANGE (Calculated from real database projects)
   const { minPrice, maxPrice } = useMemo(() => {
-    const prices = ongoingProperties
-      .map((p) => p.price)
+    const validPrices = allProjects
+      .map((p) => p.priceMin || p.price)
       .filter((p) => typeof p === 'number' && p > 0);
 
-    if (prices.length === 0) {
+    if (validPrices.length === 0) {
       return { minPrice: 0, maxPrice: 100000000 };
     }
 
-    const min = Math.min(...prices);
-    const max = Math.max(...prices);
+    const min = Math.min(...validPrices);
+    const max = Math.max(...validPrices);
 
     return {
       minPrice: min,
       maxPrice: max === min ? max + 10000000 : max
     };
-  }, [ongoingProperties]);
+  }, [allProjects]);
 
-  // Dynamic price brackets for search bar
+  // Dynamic price brackets generated from actual project prices in MongoDB
   const priceOptions = useMemo(() => {
-    const prices = ongoingProperties
-      .map((p) => p.price)
-      .filter((p) => typeof p === 'number' && p > 0)
-      .sort((a, b) => a - b);
-
-    if (prices.length <= 1) {
-      return [];
-    }
-
-    const median = prices[Math.floor(prices.length / 2)];
-    return [
-      { value: `under-${median}`, label: `Under ${formatPriceShort(median)}` },
-      { value: `above-${median}`, label: `Above ${formatPriceShort(median)}` }
-    ];
-  }, [ongoingProperties]);
+    return generatePriceBrackets(allProjects);
+  }, [allProjects]);
 
   // Filters State
   const [filters, setFilters] = useState({
     search: searchParams.get('search') || '',
+    status: searchParams.get('status') || 'all',
     location: searchParams.get('location') || 'All Locations',
     type: searchParams.get('type') || 'All Types',
     priceRange: searchParams.get('price') || 'all',
@@ -151,36 +137,80 @@ export default function Properties() {
   // Sync query params when filters change from URL
   useEffect(() => {
     const isFav = searchParams.get('favorites') === 'true';
+    const statusParam = searchParams.get('status');
     const locParam = searchParams.get('location');
     const typeParam = searchParams.get('type');
     const priceParam = searchParams.get('price');
     const bedsParam = searchParams.get('bedrooms');
+    const searchParam = searchParams.get('search');
 
     setFilters((prev) => ({
       ...prev,
       showFavoritesOnly: isFav,
+      status: statusParam || 'all',
       location: locParam || 'All Locations',
       type: typeParam || 'All Types',
       priceRange: priceParam || 'all',
-      bedrooms: bedsParam || 'all'
+      bedrooms: bedsParam || 'all',
+      search: searchParam || ''
     }));
   }, [searchParams]);
 
   const handleFilterChange = (key, value) => {
     setLoading(true);
-    setFilters((prev) => ({ ...prev, [key]: value }));
+    setFilters((prev) => {
+      const next = { ...prev, [key]: value };
+      const queryParams = new URLSearchParams(searchParams);
+
+      if (next.status && next.status !== 'all') queryParams.set('status', next.status);
+      else queryParams.delete('status');
+
+      if (next.location && next.location !== 'All Locations') queryParams.set('location', next.location);
+      else queryParams.delete('location');
+
+      if (next.type && next.type !== 'All Types') queryParams.set('type', next.type);
+      else queryParams.delete('type');
+
+      if (next.priceRange && next.priceRange !== 'all') queryParams.set('price', next.priceRange);
+      else queryParams.delete('price');
+
+      if (next.bedrooms && next.bedrooms !== 'all') queryParams.set('bedrooms', next.bedrooms);
+      else queryParams.delete('bedrooms');
+
+      if (next.search) queryParams.set('search', next.search);
+      else queryParams.delete('search');
+
+      setSearchParams(queryParams, { replace: true });
+      return next;
+    });
     setTimeout(() => setLoading(false), 200);
   };
 
-  const handleSearchFromBar = ({ location, propertyType, priceRange, bedrooms }) => {
+  const handleSearchFromBar = ({ status: newStatus, location, propertyType, priceRange, bedrooms }) => {
     setLoading(true);
-    setFilters((prev) => ({
-      ...prev,
-      location: location || 'All Locations',
-      type: propertyType || 'All Types',
-      priceRange: priceRange || 'all',
-      bedrooms: bedrooms || 'all'
-    }));
+    setFilters((prev) => {
+      const next = {
+        ...prev,
+        status: newStatus || prev.status,
+        location: location || 'All Locations',
+        type: propertyType || 'All Types',
+        priceRange: priceRange || 'all',
+        bedrooms: bedrooms || 'all'
+      };
+      const queryParams = new URLSearchParams(searchParams);
+      if (next.status && next.status !== 'all') queryParams.set('status', next.status);
+      else queryParams.delete('status');
+      if (next.location && next.location !== 'All Locations') queryParams.set('location', next.location);
+      else queryParams.delete('location');
+      if (next.type && next.type !== 'All Types') queryParams.set('type', next.type);
+      else queryParams.delete('type');
+      if (next.priceRange && next.priceRange !== 'all') queryParams.set('price', next.priceRange);
+      else queryParams.delete('price');
+      if (next.bedrooms && next.bedrooms !== 'all') queryParams.set('bedrooms', next.bedrooms);
+      else queryParams.delete('bedrooms');
+      setSearchParams(queryParams, { replace: true });
+      return next;
+    });
     setTimeout(() => setLoading(false), 200);
   };
 
@@ -188,6 +218,7 @@ export default function Properties() {
     setLoading(true);
     setFilters({
       search: '',
+      status: 'all',
       location: 'All Locations',
       type: 'All Types',
       priceRange: 'all',
@@ -200,14 +231,24 @@ export default function Properties() {
     setTimeout(() => setLoading(false), 200);
   };
 
-  // 6. FILTER ONGOING DATASET
+  // 6. FILTER PROJECTS
   const filteredProperties = useMemo(() => {
-    let result = [...ongoingProperties];
+    let result = [...allProjects];
 
+    // Favorites filter
     if (filters.showFavoritesOnly) {
       result = result.filter((p) => favorites.includes(p.id));
     }
 
+    // Project Status filter
+    if (filters.status && filters.status !== 'all') {
+      const targetStatus = filters.status.toLowerCase();
+      result = result.filter(
+        (p) => p.status?.toLowerCase() === targetStatus
+      );
+    }
+
+    // Keyword Search
     if (filters.search.trim()) {
       const q = filters.search.toLowerCase();
       result = result.filter(
@@ -220,6 +261,7 @@ export default function Properties() {
       );
     }
 
+    // Location Filter
     if (filters.location && filters.location !== 'All Locations') {
       const locQ = filters.location.toLowerCase();
       result = result.filter(
@@ -229,6 +271,7 @@ export default function Properties() {
       );
     }
 
+    // Property Type Filter
     if (filters.type && filters.type !== 'All Types') {
       const typeQ = filters.type.toLowerCase();
       result = result.filter(
@@ -236,24 +279,14 @@ export default function Properties() {
       );
     }
 
-    // Dynamic price filtering
+    // Dynamic Price Filtering
     if (filters.priceRange && filters.priceRange !== 'all') {
-      if (filters.priceRange.startsWith('under-')) {
-        const threshold = Number(filters.priceRange.replace('under-', ''));
-        if (!isNaN(threshold)) {
-          result = result.filter((p) => p.price <= threshold);
-        }
-      } else if (filters.priceRange.startsWith('above-')) {
-        const threshold = Number(filters.priceRange.replace('above-', ''));
-        if (!isNaN(threshold)) {
-          result = result.filter((p) => p.price >= threshold);
-        }
-      }
-    } else if (filters.maxPrice) {
-      result = result.filter((p) => p.price <= filters.maxPrice || p.price === 0);
+      result = result.filter((p) => projectMatchesPriceBracket(p, filters.priceRange));
+    } else if (filters.maxPrice && filters.maxPrice < maxPrice) {
+      result = result.filter((p) => (p.priceMin || p.price) <= filters.maxPrice || p.price === 0);
     }
 
-    // Dynamic bedroom filtering
+    // Bedroom Filtering
     if (filters.bedrooms !== 'all') {
       const targetBeds = String(filters.bedrooms);
       result = result.filter((p) => {
@@ -274,15 +307,56 @@ export default function Properties() {
     }
 
     return result;
-  }, [filters, favorites, ongoingProperties]);
+  }, [filters, favorites, allProjects, maxPrice]);
 
-  // 7. COMPLETED PROJECTS FINAL SAFETY CHECK
-  // Even if any non-ongoing project somehow passed, strictly exclude it here
-  const visibleProperties = useMemo(() => {
-    return filteredProperties.filter(
-      (project) => project.status?.toLowerCase() === 'ongoing'
-    );
-  }, [filteredProperties]);
+  const visibleProperties = filteredProperties;
+
+  // Dynamic header information based on active Project Status filter
+  const headerInfo = useMemo(() => {
+    if (filters.showFavoritesOnly) {
+      return {
+        badge: 'SAVED PROPERTIES',
+        title: 'Your Saved Residences',
+        subtitle: `Reviewing your ${favorites.length} saved shortlisted properties.`
+      };
+    }
+    const stat = (filters.status || 'all').toLowerCase();
+    if (stat === 'completed') {
+      return {
+        badge: 'READY FOR OCCUPANCY',
+        title: 'Completed Residences Portfolio',
+        subtitle: 'Browse our ready-to-move completed luxury residential projects with verified handovers.'
+      };
+    }
+    if (stat === 'ongoing') {
+      return {
+        badge: 'ONGOING DEVELOPMENTS PORTFOLIO',
+        title: 'Ongoing Luxury Developments',
+        subtitle: 'Browse our latest residential projects currently under active construction and development.'
+      };
+    }
+    if (stat === 'upcoming') {
+      return {
+        badge: 'PRE-LAUNCH & FUTURE VISIONS',
+        title: 'Upcoming Landmark Projects',
+        subtitle: 'Preview our forthcoming landmark developments, pre-launch opportunities, and architectural blueprints.'
+      };
+    }
+    return {
+      badge: 'COMPLETE RESIDENTIAL PORTFOLIO',
+      title: 'Luxury Residential Properties',
+      subtitle: 'Browse our comprehensive portfolio of completed, ongoing, and upcoming residential landmarks.'
+    };
+  }, [filters.status, filters.showFavoritesOnly, favorites.length]);
+
+  const countText = useMemo(() => {
+    const count = visibleProperties.length;
+    const stat = (filters.status || 'all').toLowerCase();
+    if (stat === 'completed') return `Showing ${count} Completed Residence${count !== 1 ? 's' : ''}`;
+    if (stat === 'ongoing') return `Showing ${count} Ongoing Development${count !== 1 ? 's' : ''}`;
+    if (stat === 'upcoming') return `Showing ${count} Upcoming Project${count !== 1 ? 's' : ''}`;
+    return `Showing ${count} Project${count !== 1 ? 's' : ''}`;
+  }, [visibleProperties.length, filters.status]);
 
   return (
     <div className="min-h-screen bg-[#FAF8F5]/80 backdrop-blur-xs pt-24 pb-20">
@@ -293,15 +367,13 @@ export default function Properties() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6 relative z-10">
           <div>
             <span className="text-xs uppercase tracking-[0.25em] text-[#C5A880] font-bold block mb-2">
-              ONGOING DEVELOPMENTS PORTFOLIO
+              {headerInfo.badge}
             </span>
             <h1 className="font-serif text-4xl sm:text-5xl font-bold tracking-tight uppercase">
-              {filters.showFavoritesOnly ? 'Your Saved Residences' : 'Ongoing Luxury Developments'}
+              {headerInfo.title}
             </h1>
             <p className="text-stone-300 text-sm max-w-xl mx-auto mt-3 font-light leading-relaxed">
-              {filters.showFavoritesOnly
-                ? `Reviewing your ${favorites.length} saved shortlisted properties.`
-                : 'Browse our latest ongoing residential projects currently under active development.'}
+              {headerInfo.subtitle}
             </p>
           </div>
 
@@ -314,6 +386,7 @@ export default function Properties() {
               bedroomOptions={availableBedrooms}
               priceOptions={priceOptions}
               initialValues={{
+                status: filters.status,
                 location: filters.location,
                 propertyType: filters.type,
                 priceRange: filters.priceRange,
@@ -331,7 +404,7 @@ export default function Properties() {
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8 pb-4 border-b border-stone-200">
           <div className="flex items-center gap-3">
             <span className="text-sm font-serif font-bold text-[#121417]">
-              Showing {visibleProperties.length} Ongoing Development{visibleProperties.length !== 1 ? 's' : ''}
+              {countText}
             </span>
             {filters.showFavoritesOnly && (
               <span className="px-2.5 py-0.5 bg-rose-500/10 text-rose-600 text-xs font-semibold rounded-full flex items-center gap-1">
@@ -345,7 +418,7 @@ export default function Properties() {
             {/* Mobile Filter Drawer Trigger */}
             <button
               onClick={() => setMobileFilterOpen(true)}
-              className="lg:hidden flex-1 sm:flex-none px-4 py-2.5 bg-[#121417] text-white text-xs uppercase tracking-wider font-bold rounded-xs flex items-center justify-center gap-2"
+              className="lg:hidden flex-1 sm:flex-none px-4 py-2.5 bg-[#121417] text-white text-xs uppercase tracking-wider font-bold rounded-xs flex items-center justify-center gap-2 cursor-pointer"
             >
               <SlidersHorizontal className="w-4 h-4 text-[#C5A880]" />
               <span>More Filters ({visibleProperties.length})</span>
@@ -367,6 +440,7 @@ export default function Properties() {
                 locations={availableLocations}
                 propertyTypes={availableTypes}
                 bedroomOptions={availableBedrooms}
+                priceOptions={priceOptions}
                 minPrice={minPrice}
                 maxPrice={maxPrice}
               />
@@ -379,7 +453,8 @@ export default function Properties() {
               properties={visibleProperties}
               loading={loading}
               error={error}
-              totalOngoingCount={ongoingProperties.length}
+              totalAvailableCount={allProjects.length}
+              statusFilter={filters.status}
               onResetFilters={handleReset}
             />
           </div>
@@ -411,6 +486,7 @@ export default function Properties() {
                 locations={availableLocations}
                 propertyTypes={availableTypes}
                 bedroomOptions={availableBedrooms}
+                priceOptions={priceOptions}
                 minPrice={minPrice}
                 maxPrice={maxPrice}
                 isMobileDrawer={true}

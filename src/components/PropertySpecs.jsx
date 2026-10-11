@@ -2,13 +2,14 @@ import React from 'react';
 import { Bed, Bath, Maximize2, Car, Calendar, Home, CheckCircle2 } from 'lucide-react';
 
 export default function PropertySpecs({ property }) {
+  const yearBuiltVal = property.yearBuilt || property.rawProject?.yearBuilt || property.rawProject?.completionDate || 'Not specified';
   const specs = [
-    { label: 'Bedrooms', value: `${property.bedrooms} Master Suites`, icon: Bed },
-    { label: 'Bathrooms', value: `${property.bathrooms} Designer Baths`, icon: Bath },
-    { label: 'Total Area', value: `${property.sqft.toLocaleString()} sq.ft`, icon: Maximize2 },
-    { label: 'Parking Spaces', value: `${property.parking} Garage Bays`, icon: Car },
-    { label: 'Year Built', value: property.yearBuilt, icon: Calendar },
-    { label: 'Property Type', value: property.propertyType, icon: Home },
+    { label: 'Bedrooms', value: `${property.bedrooms || '3 BHK'} Master Suites`, icon: Bed },
+    { label: 'Bathrooms', value: `${property.bathrooms || 3} Designer Baths`, icon: Bath },
+    { label: 'Total Area', value: `${(property.sqft || 1850).toLocaleString()} sq.ft`, icon: Maximize2 },
+    { label: 'Parking Spaces', value: `${property.parking || 2} Garage Bays`, icon: Car },
+    { label: 'Year Built', value: yearBuiltVal, icon: Calendar },
+    { label: 'Property Type', value: property.propertyType || 'Residence', icon: Home },
   ];
 
   return (

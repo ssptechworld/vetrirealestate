@@ -10,6 +10,7 @@ export default function PropertyFilters({
   locations = ['All Locations'],
   propertyTypes = ['All Types'],
   bedroomOptions = ['all'],
+  priceOptions = [],
   minPrice = 0,
   maxPrice = 100000000,
   isMobileDrawer = false,
@@ -53,7 +54,7 @@ export default function PropertyFilters({
           <Search className="w-4 h-4 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
-            placeholder="Search ongoing projects..."
+            placeholder="Search projects..."
             value={filters.search}
             onChange={(e) => onChange('search', e.target.value)}
             className="w-full pl-9 pr-3 py-2 bg-[#FAF8F5] border border-stone-200 rounded-xs text-sm text-[#121417] focus:outline-none focus:border-[#C5A880]"
@@ -61,7 +62,22 @@ export default function PropertyFilters({
         </div>
       </div>
 
-      {/* 2. Location (Generated dynamically from database ongoing projects) */}
+      {/* 2. Project Status Filter */}
+      <div className="space-y-2">
+        <label className="text-xs font-semibold uppercase tracking-wider text-zinc-600">Project Status</label>
+        <select
+          value={filters.status || 'all'}
+          onChange={(e) => onChange('status', e.target.value)}
+          className="w-full px-3 py-2 bg-[#FAF8F5] border border-stone-200 rounded-xs text-sm text-[#121417] focus:outline-none focus:border-[#C5A880] cursor-pointer font-medium"
+        >
+          <option value="all">All Projects</option>
+          <option value="completed">Completed</option>
+          <option value="ongoing">Ongoing</option>
+          <option value="upcoming">Upcoming</option>
+        </select>
+      </div>
+
+      {/* 3. Location */}
       <div className="space-y-2">
         <label className="text-xs font-semibold uppercase tracking-wider text-zinc-600">Location</label>
         <select
@@ -75,7 +91,7 @@ export default function PropertyFilters({
         </select>
       </div>
 
-      {/* 3. Property Type (Generated dynamically from database ongoing projects) */}
+      {/* 4. Property Type */}
       <div className="space-y-2">
         <label className="text-xs font-semibold uppercase tracking-wider text-zinc-600">Property Type</label>
         <select
@@ -89,7 +105,29 @@ export default function PropertyFilters({
         </select>
       </div>
 
-      {/* 4. Price Bracket Slider (Calculated dynamically from database ongoing projects) */}
+      {/* 5. Dynamic Price Bracket */}
+      <div className="space-y-2">
+        <label className="text-xs font-semibold uppercase tracking-wider text-zinc-600">Price Bracket</label>
+        <select
+          value={filters.priceRange || 'all'}
+          onChange={(e) => onChange('priceRange', e.target.value)}
+          disabled={priceOptions.length === 0}
+          className="w-full px-3 py-2 bg-[#FAF8F5] border border-stone-200 rounded-xs text-sm text-[#121417] focus:outline-none focus:border-[#C5A880] cursor-pointer"
+        >
+          {priceOptions.length > 0 ? (
+            <>
+              <option value="all">All Price Ranges</option>
+              {priceOptions.map((opt) => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </>
+          ) : (
+            <option value="all">No price ranges available</option>
+          )}
+        </select>
+      </div>
+
+      {/* 6. Price Bracket Slider */}
       <div className="space-y-3">
         <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-zinc-600">
           <span>Max Price</span>

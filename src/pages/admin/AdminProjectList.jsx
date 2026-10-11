@@ -69,7 +69,7 @@ export default function AdminProjectList() {
   return (
     <div className="min-h-screen bg-[#FAF8F5] text-[#121417] pt-28 pb-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        
+
         {/* Top Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 border-b border-stone-200 pb-6">
           <div>
@@ -157,7 +157,7 @@ export default function AdminProjectList() {
                 <tbody className="divide-y divide-stone-200 text-sm">
                   {projects.map((project) => (
                     <tr key={project._id} className="hover:bg-stone-50 transition-colors">
-                      
+
                       {/* Image Thumbnail */}
                       <td className="py-4 px-6">
                         <div className="w-16 h-12 rounded-xs overflow-hidden bg-stone-100 border border-stone-200">
@@ -201,11 +201,10 @@ export default function AdminProjectList() {
                         <select
                           value={project.status}
                           onChange={(e) => handleStatusChange(project._id, e.target.value)}
-                          className={`text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-xs border transition-colors cursor-pointer ${
-                            project.status === 'ongoing'
+                          className={`text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-xs border transition-colors cursor-pointer ${project.status === 'ongoing'
                               ? 'bg-amber-50 text-amber-800 border-amber-300'
                               : 'bg-emerald-50 text-emerald-800 border-emerald-300'
-                          }`}
+                            }`}
                         >
                           <option value="ongoing">ONGOING</option>
                           <option value="completed">COMPLETED</option>

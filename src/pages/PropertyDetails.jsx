@@ -194,6 +194,17 @@ export default function PropertyDetails({ onOpenInquiryModal }) {
               <span className="px-4 py-1.5 bg-[#0E1013] text-[#C5A880] text-xs font-semibold uppercase tracking-widest rounded-full border border-[#C5A880]/30">
                 {property.propertyType}
               </span>
+              {property.status && (
+                <span className={`px-4 py-1.5 text-xs font-semibold uppercase tracking-widest rounded-full border ${
+                  property.status?.toLowerCase() === 'completed'
+                    ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                    : property.status?.toLowerCase() === 'upcoming'
+                    ? 'bg-blue-50 text-blue-800 border-blue-300'
+                    : 'bg-[#C5A880]/15 text-[#8B6B3E] border-[#C5A880]/40'
+                }`}>
+                  {property.status?.toUpperCase()}
+                </span>
+              )}
               {property.isExclusive && (
                 <span className="px-4 py-1.5 bg-[#C5A880]/15 text-[#8B6B3E] border border-[#C5A880]/40 text-xs font-semibold uppercase tracking-widest rounded-full">
                   Exclusive Listing

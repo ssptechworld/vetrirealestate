@@ -8,9 +8,23 @@ export default function PropertyGrid({
   properties,
   loading,
   error,
+  totalAvailableCount,
   totalOngoingCount = 0,
+  statusFilter = 'all',
   onResetFilters
 }) {
+  const totalCount = totalAvailableCount !== undefined ? totalAvailableCount : totalOngoingCount;
+
+  const getEmptyLabel = () => {
+    const s = statusFilter?.toLowerCase();
+    if (s === 'completed') return 'Completed';
+    if (s === 'ongoing') return 'Ongoing';
+    if (s === 'upcoming') return 'Upcoming';
+    return '';
+  };
+
+  const emptyCategory = getEmptyLabel();
+
   if (loading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -46,8 +60,8 @@ export default function PropertyGrid({
   }
 
   if (!properties || properties.length === 0) {
-    // Zero ongoing projects in database
-    if (totalOngoingCount === 0) {
+    // Zero projects in database
+    if (totalCount === 0) {
       return (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -57,7 +71,9 @@ export default function PropertyGrid({
           <div className="w-16 h-16 rounded-full bg-[#FAF8F5] border border-[#C5A880]/30 flex items-center justify-center text-[#C5A880]">
             <Building className="w-8 h-8" />
           </div>
-          <h3 className="font-serif text-2xl font-bold text-[#121417]">No Ongoing Properties Available</h3>
+          <h3 className="font-serif text-2xl font-bold text-[#121417]">
+            {emptyCategory ? `No ${emptyCategory} Properties Available` : 'No Properties Available'}
+          </h3>
           <p className="text-zinc-500 text-sm max-w-md font-light">
             New properties will be listed here soon.
           </p>
@@ -65,7 +81,7 @@ export default function PropertyGrid({
       );
     }
 
-    // Ongoing projects exist, but current active filters returned 0 matches
+    // Projects exist, but current active filters returned 0 matches
     return (
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -75,9 +91,11 @@ export default function PropertyGrid({
         <div className="w-16 h-16 rounded-full bg-[#FAF8F5] border border-[#C5A880]/30 flex items-center justify-center text-[#C5A880]">
           <SearchX className="w-8 h-8" />
         </div>
-        <h3 className="font-serif text-2xl font-bold text-[#121417]">No Matching Ongoing Properties Found</h3>
+        <h3 className="font-serif text-2xl font-bold text-[#121417]">
+          {emptyCategory ? `No Matching ${emptyCategory} Properties Found` : 'No Matching Properties Found'}
+        </h3>
         <p className="text-zinc-500 text-sm max-w-md font-light">
-          We could not find any ongoing properties matching your current filter criteria. Try adjusting your filters or price range.
+          We could not find any properties matching your current filter criteria. Try adjusting your filters or price range.
         </p>
         {onResetFilters && (
           <button

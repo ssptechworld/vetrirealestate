@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, MapPin, Home, DollarSign, Bed } from 'lucide-react';
+import { Search, MapPin, Home, DollarSign, Bed, Building } from 'lucide-react';
 
 export default function SearchBar({
   onSearch,
@@ -11,35 +11,39 @@ export default function SearchBar({
   priceOptions = []
 }) {
   const navigate = useNavigate();
+  const [status, setStatus] = useState(initialValues.status || 'all');
   const [location, setLocation] = useState(initialValues.location || 'All Locations');
   const [propertyType, setPropertyType] = useState(initialValues.propertyType || 'All Types');
   const [priceRange, setPriceRange] = useState(initialValues.priceRange || 'all');
   const [bedrooms, setBedrooms] = useState(initialValues.bedrooms || 'all');
 
   useEffect(() => {
+    if (initialValues.status !== undefined) setStatus(initialValues.status);
     if (initialValues.location !== undefined) setLocation(initialValues.location);
     if (initialValues.propertyType !== undefined) setPropertyType(initialValues.propertyType);
     if (initialValues.priceRange !== undefined) setPriceRange(initialValues.priceRange);
     if (initialValues.bedrooms !== undefined) setBedrooms(initialValues.bedrooms);
-  }, [initialValues.location, initialValues.propertyType, initialValues.priceRange, initialValues.bedrooms]);
+  }, [initialValues.status, initialValues.location, initialValues.propertyType, initialValues.priceRange, initialValues.bedrooms]);
 
-  const handleFilterChange = (newLoc, newType, newPrice, newBeds) => {
+  const handleFilterChange = (newStatus, newLoc, newType, newPrice, newBeds) => {
+    const stat = newStatus !== undefined ? newStatus : status;
     const loc = newLoc !== undefined ? newLoc : location;
     const type = newType !== undefined ? newType : propertyType;
     const price = newPrice !== undefined ? newPrice : priceRange;
     const beds = newBeds !== undefined ? newBeds : bedrooms;
 
     if (onSearch) {
-      onSearch({ location: loc, propertyType: type, priceRange: price, bedrooms: beds });
+      onSearch({ status: stat, location: loc, propertyType: type, priceRange: price, bedrooms: beds });
     }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (onSearch) {
-      onSearch({ location, propertyType, priceRange, bedrooms });
+      onSearch({ status, location, propertyType, priceRange, bedrooms });
     } else {
       const queryParams = new URLSearchParams();
+      if (status && status !== 'all') queryParams.set('status', status);
       if (location && location !== 'All Locations') queryParams.set('location', location);
       if (propertyType && propertyType !== 'All Types') queryParams.set('type', propertyType);
       if (priceRange && priceRange !== 'all') queryParams.set('price', priceRange);
@@ -53,9 +57,31 @@ export default function SearchBar({
       onSubmit={handleSubmit}
       className="bg-[#121417] backdrop-blur-xl border border-white/15 p-4 sm:p-6 rounded-xs shadow-2xl w-full max-w-7xl mx-auto text-white"
     >
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         
-        {/* Location Dropdown (Dynamic from database ongoing projects) */}
+        {/* Project Status Dropdown */}
+        <div className="flex flex-col space-y-1.5">
+          <label className="text-[11px] uppercase tracking-widest text-[#C5A880] font-semibold flex items-center gap-1.5">
+            <Building className="w-3.5 h-3.5" />
+            <span>Project Status</span>
+          </label>
+          <select
+            value={status}
+            onChange={(e) => {
+              const val = e.target.value;
+              setStatus(val);
+              handleFilterChange(val, undefined, undefined, undefined, undefined);
+            }}
+            className="w-full bg-white/5 border border-white/15 rounded-xs px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-[#C5A880] transition-colors cursor-pointer appearance-none"
+          >
+            <option value="all" className="bg-[#121417] text-white">All Projects</option>
+            <option value="completed" className="bg-[#121417] text-white">Completed</option>
+            <option value="ongoing" className="bg-[#121417] text-white">Ongoing</option>
+            <option value="upcoming" className="bg-[#121417] text-white">Upcoming</option>
+          </select>
+        </div>
+
+        {/* Location Dropdown */}
         <div className="flex flex-col space-y-1.5">
           <label className="text-[11px] uppercase tracking-widest text-[#C5A880] font-semibold flex items-center gap-1.5">
             <MapPin className="w-3.5 h-3.5" />
@@ -66,7 +92,7 @@ export default function SearchBar({
             onChange={(e) => {
               const val = e.target.value;
               setLocation(val);
-              handleFilterChange(val, undefined, undefined, undefined);
+              handleFilterChange(undefined, val, undefined, undefined, undefined);
             }}
             className="w-full bg-white/5 border border-white/15 rounded-xs px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-[#C5A880] transition-colors cursor-pointer appearance-none"
           >
@@ -78,7 +104,7 @@ export default function SearchBar({
           </select>
         </div>
 
-        {/* Property Type Dropdown (Dynamic from database ongoing projects) */}
+        {/* Property Type Dropdown */}
         <div className="flex flex-col space-y-1.5">
           <label className="text-[11px] uppercase tracking-widest text-[#C5A880] font-semibold flex items-center gap-1.5">
             <Home className="w-3.5 h-3.5" />
@@ -89,7 +115,7 @@ export default function SearchBar({
             onChange={(e) => {
               const val = e.target.value;
               setPropertyType(val);
-              handleFilterChange(undefined, val, undefined, undefined);
+              handleFilterChange(undefined, undefined, val, undefined, undefined);
             }}
             className="w-full bg-white/5 border border-white/15 rounded-xs px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-[#C5A880] transition-colors cursor-pointer appearance-none"
           >
@@ -101,7 +127,7 @@ export default function SearchBar({
           </select>
         </div>
 
-        {/* Price Bracket Dropdown (Dynamic based on database ongoing projects) */}
+        {/* Price Bracket Dropdown */}
         <div className="flex flex-col space-y-1.5">
           <label className="text-[11px] uppercase tracking-widest text-[#C5A880] font-semibold flex items-center gap-1.5">
             <DollarSign className="w-3.5 h-3.5" />
@@ -112,20 +138,27 @@ export default function SearchBar({
             onChange={(e) => {
               const val = e.target.value;
               setPriceRange(val);
-              handleFilterChange(undefined, undefined, val, undefined);
+              handleFilterChange(undefined, undefined, undefined, val, undefined);
             }}
+            disabled={priceOptions.length === 0}
             className="w-full bg-white/5 border border-white/15 rounded-xs px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-[#C5A880] transition-colors cursor-pointer appearance-none"
           >
-            <option value="all" className="bg-[#121417] text-white">All Price Ranges</option>
-            {priceOptions.map((opt) => (
-              <option key={opt.value} value={opt.value} className="bg-[#121417] text-white">
-                {opt.label}
-              </option>
-            ))}
+            {priceOptions.length > 0 ? (
+              <>
+                <option value="all" className="bg-[#121417] text-white">All Price Ranges</option>
+                {priceOptions.map((opt) => (
+                  <option key={opt.value} value={opt.value} className="bg-[#121417] text-white">
+                    {opt.label}
+                  </option>
+                ))}
+              </>
+            ) : (
+              <option value="all" className="bg-[#121417] text-stone-400">No price ranges available</option>
+            )}
           </select>
         </div>
 
-        {/* Bedrooms Dropdown (Dynamic from database ongoing projects) */}
+        {/* Bedrooms Dropdown */}
         <div className="flex flex-col space-y-1.5">
           <label className="text-[11px] uppercase tracking-widest text-[#C5A880] font-semibold flex items-center gap-1.5">
             <Bed className="w-3.5 h-3.5" />
@@ -136,7 +169,7 @@ export default function SearchBar({
             onChange={(e) => {
               const val = e.target.value;
               setBedrooms(val);
-              handleFilterChange(undefined, undefined, undefined, val);
+              handleFilterChange(undefined, undefined, undefined, undefined, val);
             }}
             className="w-full bg-white/5 border border-white/15 rounded-xs px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-[#C5A880] transition-colors cursor-pointer appearance-none"
           >

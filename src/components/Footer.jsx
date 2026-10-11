@@ -49,10 +49,10 @@ export default function Footer() {
               </div>
               <div className="flex flex-col">
                 <span className="font-serif text-xl font-bold tracking-[0.2em] text-white uppercase leading-none">
-                  VV
+                  SASTHA
                 </span>
                 <span className="text-[9px] tracking-[0.25em] text-[#C5A880] uppercase mt-0.5 font-semibold">
-                  CONSTRUCTION
+                  FOUNDATION
                 </span>
               </div>
             </Link>

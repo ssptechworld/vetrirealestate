@@ -59,10 +59,10 @@ export default function Navbar({ onOpenInquiryModal }) {
             </div>
             <div className="flex flex-col">
               <span className="font-serif text-base sm:text-lg font-bold tracking-[0.2em] text-white uppercase leading-none">
-                VV
+                SASTHA
               </span>
-              <span className="text-[8px] tracking-[0.3em] text-[#C5A880] uppercase mt-0.5 font-semibold">
-                CONSTRUCTION
+              <span className="text-[10px] tracking-[0.3em] text-[#C5A880] uppercase mt-0.5 font-semibold">
+                FOUNDATION
               </span>
             </div>
           </Link>

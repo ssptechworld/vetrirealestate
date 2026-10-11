@@ -16,6 +16,7 @@ export default function AdminProjectForm({ isEdit = false }) {
     bedrooms: '3 BHK',
     area: '1850 Sq.Ft',
     completionDate: '',
+    yearBuilt: '',
     featured: false
   });
 
@@ -47,6 +48,7 @@ export default function AdminProjectForm({ isEdit = false }) {
             bedrooms: project.bedrooms || '3 BHK',
             area: project.area || '1850 Sq.Ft',
             completionDate: project.completionDate || '',
+            yearBuilt: project.yearBuilt || project.completionDate || '',
             featured: Boolean(project.featured)
           });
 
@@ -172,7 +174,8 @@ export default function AdminProjectForm({ isEdit = false }) {
       data.append('price', formData.price);
       data.append('bedrooms', formData.bedrooms);
       data.append('area', formData.area);
-      data.append('completionDate', formData.completionDate);
+      data.append('completionDate', formData.completionDate || formData.yearBuilt || '');
+      data.append('yearBuilt', formData.yearBuilt || formData.completionDate || '');
       data.append('featured', formData.featured);
 
       // Append retained existing images list
@@ -398,6 +401,7 @@ export default function AdminProjectForm({ isEdit = false }) {
                 >
                   <option value="ongoing">ONGOING</option>
                   <option value="completed">COMPLETED</option>
+                  <option value="upcoming">UPCOMING</option>
                 </select>
               </div>
 
@@ -427,7 +431,22 @@ export default function AdminProjectForm({ isEdit = false }) {
                   name="completionDate"
                   value={formData.completionDate}
                   onChange={handleChange}
-                  placeholder="e.g. Q4 2025"
+                  placeholder="e.g. Q4 2025 or 2027"
+                  className="w-full px-4 py-2.5 bg-stone-50 border border-stone-200 focus:border-[#C5A880] focus:bg-white text-sm rounded-xs transition-colors outline-none"
+                />
+              </div>
+
+              {/* Year Built */}
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-zinc-700">
+                  Year Built
+                </label>
+                <input
+                  type="text"
+                  name="yearBuilt"
+                  value={formData.yearBuilt}
+                  onChange={handleChange}
+                  placeholder="e.g. 2025"
                   className="w-full px-4 py-2.5 bg-stone-50 border border-stone-200 focus:border-[#C5A880] focus:bg-white text-sm rounded-xs transition-colors outline-none"
                 />
               </div>

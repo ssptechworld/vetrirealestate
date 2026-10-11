@@ -14,6 +14,7 @@ export default function PropertyCard({ property }) {
   const favorite = isFavorite(targetId);
 
   const isCompleted = property?.status?.toLowerCase() === 'completed' || property?.badge === 'Ready to Move' || property?.badge === 'Completed';
+  const isUpcoming = property?.status?.toLowerCase() === 'upcoming' || property?.badge === 'Upcoming';
 
   const handleNavigate = (e) => {
     if (!e.defaultPrevented && !e.metaKey && !e.ctrlKey) {
@@ -62,9 +63,11 @@ export default function PropertyCard({ property }) {
         <div className="absolute top-4 left-4 flex flex-wrap gap-2 z-10">
           <span className={`px-3.5 py-1 text-[10px] font-bold tracking-widest uppercase rounded-full border backdrop-blur-md ${isCompleted
               ? 'bg-[#121417]/90 text-[#C5A880] border-[#C5A880]/40'
+              : isUpcoming
+              ? 'bg-[#1E293B]/90 text-[#93C5FD] border-[#60A5FA]/40 shadow-xs'
               : 'bg-[#C5A880] text-[#121417] border-[#C5A880]'
             }`}>
-            {property.badge || (isCompleted ? 'Completed' : 'Ongoing')}
+            {property.badge || (isCompleted ? 'Completed' : (isUpcoming ? 'Upcoming' : 'Ongoing'))}
           </span>
 
           {property.propertyType && (
