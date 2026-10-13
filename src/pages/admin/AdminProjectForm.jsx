@@ -399,9 +399,9 @@ export default function AdminProjectForm({ isEdit = false }) {
                   onChange={handleChange}
                   className="w-full px-4 py-2.5 bg-stone-50 border border-stone-200 focus:border-[#C5A880] focus:bg-white text-sm rounded-xs transition-colors outline-none cursor-pointer font-semibold"
                 >
+                  <option value="upcoming">UPCOMING</option>
                   <option value="ongoing">ONGOING</option>
                   <option value="completed">COMPLETED</option>
-                  <option value="upcoming">UPCOMING</option>
                 </select>
               </div>
 

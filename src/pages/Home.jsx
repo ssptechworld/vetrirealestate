@@ -62,6 +62,7 @@ export default function Home({ onOpenInquiryModal }) {
 
   const [ongoingProperties, setOngoingProperties] = useState([]);
   const [completedProperties, setCompletedProperties] = useState([]);
+  const [upcomingProperties, setUpcomingProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isVideoMuted, setIsVideoMuted] = useState(true);
@@ -87,9 +88,13 @@ export default function Home({ onOpenInquiryModal }) {
           const completedRaw = rawProjects.filter(
             (project) => project.status?.toLowerCase() === 'completed'
           );
+          const upcomingRaw = rawProjects.filter(
+            (project) => project.status?.toLowerCase() === 'upcoming'
+          );
 
           setOngoingProperties(ongoingRaw.map(formatProjectForCarousel).filter(Boolean));
           setCompletedProperties(completedRaw.map(formatProjectForCarousel).filter(Boolean));
+          setUpcomingProperties(upcomingRaw.map(formatProjectForCarousel).filter(Boolean));
         }
       } catch (err) {
         console.error('Error fetching database projects in Home:', err);
@@ -97,6 +102,7 @@ export default function Home({ onOpenInquiryModal }) {
           setError('Unable to load projects. Please try again later.');
           setOngoingProperties([]);
           setCompletedProperties([]);
+          setUpcomingProperties([]);
         }
       } finally {
         if (isMounted) {
@@ -407,8 +413,105 @@ export default function Home({ onOpenInquiryModal }) {
 
 
 
-      {/* 3. FEATURED SHOWCASE: COMPLETED RESIDENCES */}
-      <section className="py-20 bg-white text-[#121417]">
+      {/* 2. ONGOING PROJECTS SECTION */}
+      <section className="py-20 bg-[#FAF8F5] border-b border-stone-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+          {/* Section Header */}
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-50px" }}
+            className="flex flex-col md:flex-row md:items-end justify-between mb-12 border-b border-stone-300 pb-6"
+          >
+            <div>
+              <span className="text-xs uppercase tracking-[0.2em] text-[#C5A880] font-bold block mb-2">
+                CURRENTLY IN DEVELOPMENT
+              </span>
+              <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#121417]">
+                Ongoing Flagship Projects
+              </h2>
+              <p className="text-xs text-stone-500 mt-1 font-light">
+                Explore our prestigious developments currently under construction with uncompromising architectural standards.
+              </p>
+            </div>
+
+            <Link
+              to="/properties?status=ongoing"
+              className="mt-4 md:mt-0 text-xs uppercase tracking-[0.2em] text-[#121417] hover:text-[#C5A880] font-bold flex items-center gap-2 transition-colors group"
+            >
+              <span>View Ongoing Listings</span>
+              <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+            </Link>
+          </motion.div>
+
+          {/* Properties Carousel / Loading / Error / Empty States */}
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-50px" }}
+          >
+            {loading ? (
+              <div className="space-y-6">
+                <div className="py-4 flex justify-center items-center gap-3 text-[#C5A880]">
+                  <div className="w-5 h-5 border-2 border-[#C5A880] border-t-transparent rounded-full animate-spin" />
+                  <span className="uppercase tracking-widest font-bold text-xs text-stone-600">
+                    Loading Ongoing Developments...
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 py-2">
+                  {[1, 2, 3].map((n) => (
+                    <div
+                      key={n}
+                      className="bg-white rounded-[32px] sm:rounded-[38px] p-5 border border-stone-200/80 shadow-xs animate-pulse space-y-4"
+                    >
+                      <div className="aspect-[4/3] rounded-[28px] bg-stone-200/80" />
+                      <div className="p-2 space-y-3">
+                        <div className="h-3 bg-stone-200/60 rounded-full w-1/3" />
+                        <div className="h-5 bg-stone-200/80 rounded-full w-3/4" />
+                        <div className="h-9 bg-stone-100 rounded-full w-full mt-4" />
+                        <div className="h-10 bg-stone-200/60 rounded-full w-full mt-2" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : error ? (
+              <div className="py-14 px-6 text-center bg-white border border-stone-200/80 rounded-[32px] max-w-lg mx-auto space-y-3">
+                <div className="w-12 h-12 mx-auto rounded-full bg-amber-50 border border-amber-200 text-amber-700 flex items-center justify-center">
+                  <AlertCircle className="w-6 h-6" />
+                </div>
+                <h3 className="font-serif text-lg font-bold text-[#121417]">
+                  Unable to load projects.
+                </h3>
+                <p className="text-xs text-stone-500 font-light">
+                  Please try again later.
+                </p>
+              </div>
+            ) : ongoingProperties.length > 0 ? (
+              <PropertyCarousel properties={ongoingProperties} />
+            ) : (
+              <div className="py-16 px-6 text-center bg-white border border-stone-200/80 rounded-[32px] max-w-lg mx-auto space-y-3 shadow-xs">
+                <div className="w-12 h-12 mx-auto rounded-full bg-[#C5A880]/10 border border-[#C5A880]/30 text-[#C5A880] flex items-center justify-center">
+                  <Building className="w-6 h-6" />
+                </div>
+                <h3 className="font-serif text-xl font-bold text-[#121417]">
+                  No Ongoing Projects
+                </h3>
+                <p className="text-xs sm:text-sm text-stone-500 font-light">
+                  New developments will be showcased here.
+                </p>
+              </div>
+            )}
+          </motion.div>
+
+        </div>
+      </section>
+
+      {/* 3. COMPLETED PROJECTS SECTION */}
+      <section className="py-20 bg-white border-b border-stone-200 text-[#121417]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
           {/* Section Header */}
@@ -432,10 +535,10 @@ export default function Home({ onOpenInquiryModal }) {
             </div>
 
             <Link
-              to="/properties"
+              to="/properties?status=completed"
               className="mt-4 md:mt-0 text-xs uppercase tracking-[0.2em] text-[#121417] hover:text-[#C5A880] font-bold flex items-center gap-2 transition-colors group"
             >
-              <span>Explore All Projects</span>
+              <span>Explore Completed Projects</span>
               <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
             </Link>
           </motion.div>
@@ -504,8 +607,8 @@ export default function Home({ onOpenInquiryModal }) {
         </div>
       </section>
 
-      {/* 4. ONGOING PROJECTS SECTION */}
-      <section className="py-20 bg-[#F5F2EC] border-y border-stone-200">
+      {/* 4. UPCOMING PROJECTS SECTION */}
+      <section className="py-20 bg-[#F5F2EC] border-b border-stone-200 text-[#121417]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
           {/* Section Header */}
@@ -518,18 +621,21 @@ export default function Home({ onOpenInquiryModal }) {
           >
             <div>
               <span className="text-xs uppercase tracking-[0.2em] text-[#C5A880] font-bold block mb-2">
-                CURRENTLY IN DEVELOPMENT
+                COMING SOON & FUTURE DEVELOPMENTS
               </span>
               <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#121417]">
-                Ongoing Flagship Projects
+                Upcoming Projects
               </h2>
+              <p className="text-xs text-stone-500 mt-1 font-light">
+                Preview our upcoming luxury architectural landmarks and future developments.
+              </p>
             </div>
 
             <Link
-              to="/properties"
+              to="/properties?status=upcoming"
               className="mt-4 md:mt-0 text-xs uppercase tracking-[0.2em] text-[#121417] hover:text-[#C5A880] font-bold flex items-center gap-2 transition-colors group"
             >
-              <span>View All Listings</span>
+              <span>Explore Upcoming Projects</span>
               <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
             </Link>
           </motion.div>
@@ -546,7 +652,7 @@ export default function Home({ onOpenInquiryModal }) {
                 <div className="py-4 flex justify-center items-center gap-3 text-[#C5A880]">
                   <div className="w-5 h-5 border-2 border-[#C5A880] border-t-transparent rounded-full animate-spin" />
                   <span className="uppercase tracking-widest font-bold text-xs text-stone-600">
-                    Loading Ongoing Developments...
+                    Loading Upcoming Developments...
                   </span>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 py-2">
@@ -578,18 +684,18 @@ export default function Home({ onOpenInquiryModal }) {
                   Please try again later.
                 </p>
               </div>
-            ) : ongoingProperties.length > 0 ? (
-              <PropertyCarousel properties={ongoingProperties} />
+            ) : upcomingProperties.length > 0 ? (
+              <PropertyCarousel properties={upcomingProperties} />
             ) : (
               <div className="py-16 px-6 text-center bg-white border border-stone-200/80 rounded-[32px] max-w-lg mx-auto space-y-3 shadow-xs">
                 <div className="w-12 h-12 mx-auto rounded-full bg-[#C5A880]/10 border border-[#C5A880]/30 text-[#C5A880] flex items-center justify-center">
                   <Building className="w-6 h-6" />
                 </div>
                 <h3 className="font-serif text-xl font-bold text-[#121417]">
-                  No Ongoing Projects
+                  No Upcoming Projects
                 </h3>
                 <p className="text-xs sm:text-sm text-stone-500 font-light">
-                  New developments will be showcased here.
+                  Exciting new developments will be announced here soon.
                 </p>
               </div>
             )}

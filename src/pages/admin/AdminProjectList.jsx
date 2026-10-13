@@ -201,11 +201,15 @@ export default function AdminProjectList() {
                         <select
                           value={project.status}
                           onChange={(e) => handleStatusChange(project._id, e.target.value)}
-                          className={`text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-xs border transition-colors cursor-pointer ${project.status === 'ongoing'
+                          className={`text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-xs border transition-colors cursor-pointer ${
+                            project.status === 'upcoming'
+                              ? 'bg-blue-50 text-blue-800 border-blue-300'
+                              : project.status === 'ongoing'
                               ? 'bg-amber-50 text-amber-800 border-amber-300'
                               : 'bg-emerald-50 text-emerald-800 border-emerald-300'
-                            }`}
+                          }`}
                         >
+                          <option value="upcoming">UPCOMING</option>
                           <option value="ongoing">ONGOING</option>
                           <option value="completed">COMPLETED</option>
                         </select>
