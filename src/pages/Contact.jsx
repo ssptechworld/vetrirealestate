@@ -129,9 +129,9 @@ export default function Contact() {
 
   const office = {
     name: "SASTHA FOUNDATION Head Office",
-    address: "No. 16, Santro City, Chembarambakkam, Chennai - 600123",
+    address: "No:7,Ambedkar street,Cross Road,Nanmangalam,Chennai 600129",
     phone: "+91 93800 05934",
-    email: "concierge@vetrivelrealestate.com",
+    email: "srisasthafoundations@gmail.com",
     hours: "Mon – Sat: 9:00 AM – 7:00 PM",
     mapUrl: "https://www.google.com/maps/search/?api=1&query=16,+Santro+City,+Chembarambakkam,+Chennai",
     embedUrl: "https://maps.google.com/maps?q=16,+Santro+City,+Chembarambakkam,+Chennai&t=&z=15&ie=UTF8&iwloc=&output=embed"

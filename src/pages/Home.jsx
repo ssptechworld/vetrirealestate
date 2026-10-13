@@ -62,7 +62,6 @@ export default function Home({ onOpenInquiryModal }) {
 
   const [ongoingProperties, setOngoingProperties] = useState([]);
   const [completedProperties, setCompletedProperties] = useState([]);
-  const [upcomingProperties, setUpcomingProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isVideoMuted, setIsVideoMuted] = useState(true);
@@ -75,31 +74,22 @@ export default function Home({ onOpenInquiryModal }) {
         setLoading(true);
         setError(null);
 
-        // Fetch real projects from backend database API in a single shared request
+        // Fetch real projects from backend database API
         const data = await getProjects();
 
         if (isMounted) {
           const rawProjects = Array.isArray(data) ? data : [];
 
-          // Separate real projects based on actual database status efficiently
-          const completedRaw = [];
-          const ongoingRaw = [];
-          const upcomingRaw = [];
+          // Separate real projects based on actual database status
+          const ongoingRaw = rawProjects.filter(
+            (project) => project.status?.toLowerCase() === 'ongoing'
+          );
+          const completedRaw = rawProjects.filter(
+            (project) => project.status?.toLowerCase() === 'completed'
+          );
 
-          for (const project of rawProjects) {
-            const status = project.status?.toLowerCase();
-            if (status === 'completed') {
-              completedRaw.push(project);
-            } else if (status === 'upcoming') {
-              upcomingRaw.push(project);
-            } else {
-              ongoingRaw.push(project);
-            }
-          }
-
-          setCompletedProperties(completedRaw.map(formatProjectForCarousel).filter(Boolean));
           setOngoingProperties(ongoingRaw.map(formatProjectForCarousel).filter(Boolean));
-          setUpcomingProperties(upcomingRaw.map(formatProjectForCarousel).filter(Boolean));
+          setCompletedProperties(completedRaw.map(formatProjectForCarousel).filter(Boolean));
         }
       } catch (err) {
         console.error('Error fetching database projects in Home:', err);
@@ -107,7 +97,6 @@ export default function Home({ onOpenInquiryModal }) {
           setError('Unable to load projects. Please try again later.');
           setOngoingProperties([]);
           setCompletedProperties([]);
-          setUpcomingProperties([]);
         }
       } finally {
         if (isMounted) {
@@ -326,9 +315,7 @@ export default function Home({ onOpenInquiryModal }) {
         <div className="absolute inset-0 z-0 overflow-hidden">
           <img
             src={homeHeroImg}
-            alt="Vetri Real Estate"
-            fetchPriority="high"
-            decoding="async"
+            alt=""
             className="w-full h-full object-cover object-center scale-105"
           />
           {/* Sophisticated Dark Cinematic Overlay */}
@@ -434,7 +421,7 @@ export default function Home({ onOpenInquiryModal }) {
           >
             <div>
               <span className="text-xs uppercase tracking-[0.2em] text-[#C5A880] font-bold block mb-2">
-                READY FOR OCCUPANCY
+                READY-TO-MOVE RESIDENCES
               </span>
               <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#121417]">
                 Completed Residences Showcase
@@ -531,7 +518,7 @@ export default function Home({ onOpenInquiryModal }) {
           >
             <div>
               <span className="text-xs uppercase tracking-[0.2em] text-[#C5A880] font-bold block mb-2">
-                UNDER ACTIVE DEVELOPMENT
+                CURRENTLY IN DEVELOPMENT
               </span>
               <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#121417]">
                 Ongoing Flagship Projects
@@ -603,103 +590,6 @@ export default function Home({ onOpenInquiryModal }) {
                 </h3>
                 <p className="text-xs sm:text-sm text-stone-500 font-light">
                   New developments will be showcased here.
-                </p>
-              </div>
-            )}
-          </motion.div>
-
-        </div>
-      </section>
-
-      {/* 4.5. UPCOMING PROJECTS SECTION */}
-      <section className="py-20 bg-white text-[#121417]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
-          {/* Section Header */}
-          <motion.div
-            variants={fadeUp}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-50px" }}
-            className="flex flex-col md:flex-row md:items-end justify-between mb-12 border-b border-stone-200 pb-6"
-          >
-            <div>
-              <span className="text-xs uppercase tracking-[0.2em] text-[#C5A880] font-bold block mb-2">
-                PRE-LAUNCH & FUTURE VISIONS
-              </span>
-              <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#121417]">
-                Upcoming Landmark Projects
-              </h2>
-              <p className="text-xs text-stone-500 mt-1 font-light">
-                Preview our forthcoming premium residential developments and pre-launch opportunities.
-              </p>
-            </div>
-
-            <Link
-              to="/properties?status=upcoming"
-              className="mt-4 md:mt-0 text-xs uppercase tracking-[0.2em] text-[#121417] hover:text-[#C5A880] font-bold flex items-center gap-2 transition-colors group"
-            >
-              <span>View All Upcoming</span>
-              <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-            </Link>
-          </motion.div>
-
-          {/* Properties Carousel / Loading / Error / Empty States */}
-          <motion.div
-            variants={fadeUp}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-50px" }}
-          >
-            {loading ? (
-              <div className="space-y-6">
-                <div className="py-4 flex justify-center items-center gap-3 text-[#C5A880]">
-                  <div className="w-5 h-5 border-2 border-[#C5A880] border-t-transparent rounded-full animate-spin" />
-                  <span className="uppercase tracking-widest font-bold text-xs text-stone-600">
-                    Loading Upcoming Developments...
-                  </span>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 py-2">
-                  {[1, 2, 3].map((n) => (
-                    <div
-                      key={n}
-                      className="bg-white rounded-[32px] sm:rounded-[38px] p-5 border border-stone-200/80 shadow-xs animate-pulse space-y-4"
-                    >
-                      <div className="aspect-[4/3] rounded-[28px] bg-stone-200/80" />
-                      <div className="p-2 space-y-3">
-                        <div className="h-3 bg-stone-200/60 rounded-full w-1/3" />
-                        <div className="h-5 bg-stone-200/80 rounded-full w-3/4" />
-                        <div className="h-9 bg-stone-100 rounded-full w-full mt-4" />
-                        <div className="h-10 bg-stone-200/60 rounded-full w-full mt-2" />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ) : error ? (
-              <div className="py-14 px-6 text-center bg-stone-50 border border-stone-200/80 rounded-[32px] max-w-lg mx-auto space-y-3">
-                <div className="w-12 h-12 mx-auto rounded-full bg-amber-50 border border-amber-200 text-amber-700 flex items-center justify-center">
-                  <AlertCircle className="w-6 h-6" />
-                </div>
-                <h3 className="font-serif text-lg font-bold text-[#121417]">
-                  Unable to load upcoming projects.
-                </h3>
-                <p className="text-xs text-stone-500 font-light">
-                  Please try again later.
-                </p>
-              </div>
-            ) : upcomingProperties.length > 0 ? (
-              <PropertyCarousel properties={upcomingProperties} />
-            ) : (
-              <div className="py-16 px-6 text-center bg-[#FAF8F5] border border-stone-200/80 rounded-[32px] max-w-lg mx-auto space-y-3 shadow-xs">
-                <div className="w-12 h-12 mx-auto rounded-full bg-[#C5A880]/10 border border-[#C5A880]/30 text-[#C5A880] flex items-center justify-center">
-                  <Building className="w-6 h-6" />
-                </div>
-                <h3 className="font-serif text-xl font-bold text-[#121417]">
-                  No Upcoming Projects At Present
-                </h3>
-                <p className="text-xs sm:text-sm text-stone-500 font-light">
-                  Our forthcoming residential landmark developments will be premiered here soon.
                 </p>
               </div>
             )}
@@ -945,10 +835,10 @@ export default function Home({ onOpenInquiryModal }) {
                     variants={fadeUp}
                     whileHover={{ y: -7 }}
                     className={`group relative rounded-[28px] sm:rounded-[36px] border border-white/20 hover:border-[#C5A880]/80 shadow-md hover:shadow-2xl hover:shadow-[#C5A880]/20 transition-all duration-500 flex flex-col justify-between overflow-hidden bg-[#121417] ${isHero
-                        ? "sm:col-span-2 lg:col-span-2 lg:row-span-2 p-7 sm:p-9 min-h-[380px] sm:min-h-[460px]"
-                        : isWideFeature
-                          ? "sm:col-span-2 lg:col-span-2 p-6 sm:p-7 min-h-[220px] sm:min-h-[240px]"
-                          : "col-span-1 p-6 sm:p-7 min-h-[220px] sm:min-h-[240px]"
+                      ? "sm:col-span-2 lg:col-span-2 lg:row-span-2 p-7 sm:p-9 min-h-[380px] sm:min-h-[460px]"
+                      : isWideFeature
+                        ? "sm:col-span-2 lg:col-span-2 p-6 sm:p-7 min-h-[220px] sm:min-h-[240px]"
+                        : "col-span-1 p-6 sm:p-7 min-h-[220px] sm:min-h-[240px]"
                       }`}
                   >
                     {/* Unique Full-Bleed Architectural Photography Background */}
@@ -988,8 +878,8 @@ export default function Home({ onOpenInquiryModal }) {
                     {/* Large Subtle Background Watermark Number */}
                     <span
                       className={`absolute right-4 font-serif font-bold text-white/[0.06] group-hover:text-[#C5A880]/[0.18] select-none pointer-events-none transition-all duration-700 ease-out group-hover:scale-105 group-hover:-translate-y-1 z-[1] ${isHero
-                          ? "bottom-4 text-8xl sm:text-9xl"
-                          : "bottom-2 text-6xl sm:text-7xl"
+                        ? "bottom-4 text-8xl sm:text-9xl"
+                        : "bottom-2 text-6xl sm:text-7xl"
                         }`}
                     >
                       {String(idx + 1).padStart(2, '0')}
@@ -1017,8 +907,8 @@ export default function Home({ onOpenInquiryModal }) {
 
                         <div
                           className={`rounded-2xl group-hover:rounded-full bg-[#121417]/70 backdrop-blur-md border border-[#C5A880]/45 text-[#C5A880] group-hover:bg-[#121417] group-hover:text-white group-hover:border-[#C5A880] flex items-center justify-center transition-all duration-500 shadow-lg ${isHero
-                              ? "w-14 h-14 sm:w-16 sm:h-16"
-                              : "w-11 h-11 sm:w-12 sm:h-12"
+                            ? "w-14 h-14 sm:w-16 sm:h-16"
+                            : "w-11 h-11 sm:w-12 sm:h-12"
                             }`}
                         >
                           <Icon
@@ -1034,8 +924,8 @@ export default function Home({ onOpenInquiryModal }) {
                       {/* Gold Accent Line that expands smoothly on hover */}
                       <div
                         className={`h-[2px] bg-[#C5A880] transition-all duration-500 ease-out rounded-full ${isHero
-                            ? "w-10 group-hover:w-20"
-                            : "w-6 group-hover:w-12"
+                          ? "w-10 group-hover:w-20"
+                          : "w-6 group-hover:w-12"
                           }`}
                       />
 
@@ -1050,8 +940,8 @@ export default function Home({ onOpenInquiryModal }) {
                       {/* Title in White with High Contrast */}
                       <h3
                         className={`font-serif font-bold text-white group-hover:text-[#C5A880] transition-colors duration-300 leading-snug drop-shadow-xs ${isHero
-                            ? "text-xl sm:text-2xl lg:text-3xl max-w-md"
-                            : "text-sm sm:text-[15px]"
+                          ? "text-xl sm:text-2xl lg:text-3xl max-w-md"
+                          : "text-sm sm:text-[15px]"
                           }`}
                       >
                         {item.title}

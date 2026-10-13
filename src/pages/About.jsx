@@ -21,6 +21,7 @@ import aboutIntroVilla from '../assets/about_intro_villa.jpg';
 import aboutCourtyard from '../assets/about_courtyard.jpg';
 import aboutHeroVilla from '../assets/about_hero_villa.jpg';
 import builtByUsBg from '../assets/built_by_us_bg.jpg';
+import Founder from '../assets/Murugar.jpg'
 
 /**
  * FOUNDER ASSET CONFIGURATION:
@@ -28,7 +29,7 @@ import builtByUsBg from '../assets/built_by_us_bg.jpg';
  * Set to null by default so a clean, dignified portrait placeholder is rendered instead
  * of using unverified stock photography.
  */
-const FOUNDER_PHOTO = null;
+const FOUNDER_PHOTO = Founder;
 
 // Confirmed Founder Information
 const FOUNDER_INFO = {
@@ -151,86 +152,200 @@ export default function About() {
         </div>
       </section>
 
-      {/* 2. COMPANY INTRODUCTION & APPROACH */}
-      <section className="py-20 sm:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+      {/* 4. FOUNDER PROFILE SECTION: "Meet Our Founder" */}
+      <section className="py-20 sm:py-28 bg-[#0E1013] text-white border-y border-[#C5A880]/20 relative overflow-hidden rounded-[48px] sm:rounded-[64px] my-14 shadow-2xl max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#C5A880]/10 via-transparent to-transparent pointer-events-none" />
 
+        <div className="relative z-10 max-w-6xl mx-auto">
+
+          {/* Section Header */}
           <motion.div
             variants={fadeUp}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-50px" }}
-            className="space-y-6"
+            className="text-center max-w-2xl mx-auto mb-14 space-y-3"
           >
-            <div className="inline-flex items-center gap-2">
-              <span className="w-6 h-px bg-[#C5A880]" />
-              <span className="text-xs uppercase tracking-widest text-[#C5A880] font-semibold">
-                Our Philosophy & Approach
-              </span>
-            </div>
-
-            <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#0E1013] leading-snug">
-              A Rigorous Commitment to Quality Real Estate & Construction
+            <span className="text-xs uppercase tracking-widest text-[#C5A880] font-semibold block">
+              Leadership & Vision
+            </span>
+            <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-white">
+              Meet Our Founder
             </h2>
-
-            <p className="text-zinc-700 text-sm sm:text-base leading-relaxed font-light">
-              Vetri Real Estate brings together specialized construction expertise and thoughtful property development. We believe that true real estate excellence is rooted in robust structural engineering, meticulous planning, and an honest partnership with every buyer.
+            <p className="text-zinc-400 text-sm font-light">
+              Guiding our organization with a core commitment to structural durability, client satisfaction, and dependable execution.
             </p>
-
-            <p className="text-zinc-700 text-sm leading-relaxed font-light">
-              From foundational civil work to final architectural finishes, our team adheres to strict quality benchmarks, premium materials, and transparent client communication. We build residences designed to provide generational security, functional elegance, and lasting pride of ownership.
-            </p>
-
-            {/* Approach Pillars */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 pt-4">
-              <div className="bg-white p-5 rounded-[24px] border border-stone-200/90 shadow-sm space-y-2">
-                <div className="w-9 h-9 rounded-full bg-[#FAF8F5] border border-[#C5A880]/40 text-[#C5A880] flex items-center justify-center">
-                  <HardHat className="w-4 h-4" />
-                </div>
-                <h3 className="font-serif font-bold text-[#0E1013] text-base">Quality-First Construction</h3>
-                <p className="text-xs text-zinc-600 leading-relaxed font-light">
-                  Adhering to strict structural benchmarks, certified materials, and thorough site inspections.
-                </p>
-              </div>
-
-              <div className="bg-white p-5 rounded-[24px] border border-stone-200/90 shadow-sm space-y-2">
-                <div className="w-9 h-9 rounded-full bg-[#FAF8F5] border border-[#C5A880]/40 text-[#C5A880] flex items-center justify-center">
-                  <ShieldCheck className="w-4 h-4" />
-                </div>
-                <h3 className="font-serif font-bold text-[#0E1013] text-base">Transparent Communication</h3>
-                <p className="text-xs text-zinc-600 leading-relaxed font-light">
-                  Direct paperwork, milestone clarity, and responsive guidance throughout every transaction.
-                </p>
-              </div>
-            </div>
           </motion.div>
 
-          <motion.div
-            variants={fadeUp}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-50px" }}
-            className="relative"
-          >
-            <div className="aspect-[4/3] rounded-t-[120px] sm:rounded-t-[200px] rounded-b-[36px] overflow-hidden border border-[#C5A880]/30 shadow-2xl relative group bg-[#121417]">
-              <img
-                src={aboutIntroVilla}
-                alt="Vetri Real Estate Architectural Showcase"
-                loading="lazy"
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0E1013]/70 via-transparent to-transparent" />
-              <div className="absolute bottom-6 left-6 right-6 p-4 rounded-2xl bg-[#0E1013]/85 backdrop-blur-md border border-[#C5A880]/30 text-white text-xs">
-                <span className="text-[#C5A880] font-semibold block uppercase tracking-widest text-[10px]">
-                  Architectural Standard
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+
+            {/* Left Column: Founder Portrait / Clean Dignified Placeholder */}
+            <motion.div
+              variants={fadeUp}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-50px" }}
+              className="lg:col-span-5 flex justify-center"
+            >
+              <div className="w-full max-w-md aspect-[3/4] rounded-t-[140px] sm:rounded-t-[200px] rounded-b-[36px] overflow-hidden border border-[#C5A880]/40 relative shadow-2xl bg-gradient-to-b from-[#181B20] via-[#121417] to-[#0B0C0E] p-8 flex flex-col items-center justify-between text-center group">
+
+                {/* Background decorative subtle grid */}
+                <div className="absolute inset-0 bg-[radial-gradient(#C5A880_1px,transparent_1px)] [background-size:24px_24px] opacity-10 pointer-events-none" />
+
+                {/* Ambient glow */}
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#C5A880]/15 via-transparent to-transparent pointer-events-none" />
+
+                {/* If verified photo exists, render it; otherwise, render the clean placeholder */}
+                {FOUNDER_PHOTO ? (
+                  <img
+                    src={FOUNDER_PHOTO}
+                    alt={`${FOUNDER_INFO.name} — ${FOUNDER_INFO.designation}`}
+                    className="w-full h-full object-cover rounded-t-[120px] rounded-b-[28px]"
+                  />
+                ) : (
+                  <div className="relative z-10 w-full h-full flex flex-col items-center justify-center space-y-6 py-6">
+
+                    {/* Founder Monogram Medallion */}
+                    <div className="relative">
+                      <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-[#121417] border-2 border-[#C5A880]/70 flex items-center justify-center shadow-2xl relative">
+                        <span className="font-serif text-3xl sm:text-4xl font-bold text-[#C5A880] tracking-wider">
+                          VK
+                        </span>
+                      </div>
+                      <div className="absolute -inset-2 rounded-full border border-[#C5A880]/20 animate-pulse pointer-events-none" />
+                    </div>
+
+                    <div className="space-y-2">
+                      <h3 className="font-serif text-2xl font-bold text-white tracking-wide">
+                        {FOUNDER_INFO.name}
+                      </h3>
+                      <p className="text-xs tracking-[0.25em] uppercase text-[#C5A880] font-semibold">
+                        {FOUNDER_INFO.designation}
+                      </p>
+                    </div>
+
+                    {/* Placeholder pill */}
+                    <div className="bg-[#0E1013]/90 border border-dashed border-[#C5A880]/50 rounded-2xl px-4 py-3 max-w-xs space-y-1">
+                      <span className="text-[10px] uppercase tracking-wider text-[#C5A880] font-semibold block">
+                        Official Portrait Placeholder
+                      </span>
+                      <p className="text-[11px] text-zinc-400 font-light leading-relaxed">
+                        A clean placeholder is displayed until the verified portrait is provided. No stock photos used.
+                      </p>
+                    </div>
+
+                  </div>
+                )}
+
+                {/* Bottom Frame Accent */}
+                <div className="relative z-10 text-[10px] text-zinc-500 uppercase tracking-widest font-mono">
+                  Vetri Real Estate Leadership
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Right Column: Founder Details */}
+            <motion.div
+              variants={fadeUp}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-50px" }}
+              className="lg:col-span-7 space-y-6"
+            >
+
+              <div className="space-y-2">
+                <span className="text-xs uppercase tracking-[0.25em] text-[#C5A880] font-semibold block">
+                  Executive Profile
                 </span>
-                Precision Engineering & Lasting Craftsmanship
+                <h3 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight">
+                  {FOUNDER_INFO.name}
+                </h3>
+                <div className="inline-flex items-center gap-2 pt-1">
+                  <span className="px-3 py-1 rounded-full bg-[#C5A880]/15 border border-[#C5A880]/30 text-[#C5A880] text-xs font-semibold uppercase tracking-wider">
+                    {FOUNDER_INFO.designation}
+                  </span>
+                  <span className="text-xs text-zinc-400 font-light">
+                    SASTHA FOUNDATION
+                  </span>
+                </div>
               </div>
-            </div>
-          </motion.div>
+
+              {/* Biography Block with Editable Placeholder */}
+              <div className="bg-[#181B20] p-6 rounded-[28px] border border-stone-800 space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-serif font-bold text-white text-base flex items-center gap-2">
+                    <User className="w-4 h-4 text-[#C5A880]" />
+                    Biography & Background
+                  </h4>
+                  <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-[#C5A880]/15 text-[#C5A880] border border-[#C5A880]/30 font-medium">
+                    Editable Placeholder
+                  </span>
+                </div>
+
+                <div className="p-4 rounded-xl bg-[#121417] border border-dashed border-[#C5A880]/50">
+                  <p className="font-mono text-xs sm:text-sm text-stone-300 italic leading-relaxed">
+                    Vijayakumar, the Founder of SASTHA FOUNDATION, believes that building a home is about more than creating a structure — it is about shaping a better future for families and communities.
+
+                    With a vision centered on trust, quality, and long-term value, he aims to establish a foundation built on integrity, thoughtful planning, and customer satisfaction. His approach emphasizes the importance of understanding people's needs and creating spaces that offer comfort, confidence, and lasting value.
+
+                    Through his leadership, SASTHA FOUNDATION aspires to build meaningful relationships with customers and contribute to the development of well-planned residential spaces. His commitment is to make the home-buying journey more transparent, reliable, and rewarding for every customer.
+                  </p>
+                </div>
+
+                <p className="text-xs text-zinc-400 font-light leading-relaxed">
+                  The founder's verified biography, background, and career history will be displayed here once official documentation is provided. No unverified claims or dates have been fabricated.
+                </p>
+              </div>
+
+              {/* Founder's Vision Statement / Optional Personal Message */}
+              <div className="bg-[#181B20] p-6 rounded-[28px] border border-stone-800 space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-serif font-bold text-white text-base flex items-center gap-2">
+                    <Quote className="w-4 h-4 text-[#C5A880]" />
+                    Founder's Vision Statement
+                  </h4>
+                  <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-[#C5A880]/15 text-[#C5A880] border border-[#C5A880]/30 font-medium">
+                    Editable Placeholder
+                  </span>
+                </div>
+
+                <div className="p-4 rounded-xl bg-[#121417] border border-dashed border-[#C5A880]/50 space-y-2">
+                  <p className="font-mono text-xs sm:text-sm text-stone-300 italic leading-relaxed pl-2 border-l-2 border-[#C5A880]">
+                    We believe in building more than just homes — we are committed to creating spaces that offer comfort, confidence, and lasting value. Our goal is to make the home-buying journey more transparent, reliable, and rewarding for every customer.
+                  </p>
+                  <p className="text-right text-[11px] text-[#C5A880] font-medium">
+                    — {FOUNDER_INFO.name}, {FOUNDER_INFO.designation}
+                  </p>
+                </div>
+
+                <p className="text-xs text-zinc-400 font-light leading-relaxed">
+                  A personal leadership message or company vision statement can be placed here to articulate the founder's ethos to prospective property buyers.
+                </p>
+              </div>
+
+              {/* Leadership Guiding Principles */}
+              <div className="pt-2 flex flex-wrap gap-2 sm:gap-3 text-xs">
+                <span className="px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 text-stone-300 flex items-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#C5A880]" />
+                  Structural Integrity
+                </span>
+                <span className="px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 text-stone-300 flex items-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#C5A880]" />
+                  Transparent Dealings
+                </span>
+                <span className="px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 text-stone-300 flex items-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#C5A880]" />
+                  Customer Satisfaction
+                </span>
+              </div>
+
+            </motion.div>
+
+          </div>
 
         </div>
       </section>
+
 
       {/* 3. COMPANY PROFILES SECTION: "Our Companies & Brands" */}
       <section className="py-20 sm:py-24 bg-white border-y border-stone-200/80">
@@ -281,7 +396,7 @@ export default function About() {
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0E1013]/80 via-transparent to-transparent" />
-                  
+
                   {/* Monogram Seal */}
                   <div className="absolute top-4 left-4 w-10 h-10 rounded-xl bg-[#0E1013]/90 backdrop-blur-sm border border-[#C5A880]/40 flex items-center justify-center text-[#C5A880] font-serif font-bold text-sm shadow-md">
                     {profile.initials}
@@ -298,7 +413,7 @@ export default function About() {
 
                 {/* Profile Card Body */}
                 <div className="p-6 sm:p-7 flex-1 flex flex-col justify-between space-y-6">
-                  
+
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] uppercase tracking-widest text-[#C5A880] font-bold">
@@ -347,199 +462,10 @@ export default function About() {
         </div>
       </section>
 
-      {/* 4. FOUNDER PROFILE SECTION: "Meet Our Founder" */}
-      <section className="py-20 sm:py-28 bg-[#0E1013] text-white border-y border-[#C5A880]/20 relative overflow-hidden rounded-[48px] sm:rounded-[64px] my-14 shadow-2xl max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#C5A880]/10 via-transparent to-transparent pointer-events-none" />
-
-        <div className="relative z-10 max-w-6xl mx-auto">
-          
-          {/* Section Header */}
-          <motion.div
-            variants={fadeUp}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-50px" }}
-            className="text-center max-w-2xl mx-auto mb-14 space-y-3"
-          >
-            <span className="text-xs uppercase tracking-widest text-[#C5A880] font-semibold block">
-              Leadership & Vision
-            </span>
-            <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-white">
-              Meet Our Founder
-            </h2>
-            <p className="text-zinc-400 text-sm font-light">
-              Guiding our organization with a core commitment to structural durability, client satisfaction, and dependable execution.
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
-            
-            {/* Left Column: Founder Portrait / Clean Dignified Placeholder */}
-            <motion.div
-              variants={fadeUp}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-50px" }}
-              className="lg:col-span-5 flex justify-center"
-            >
-              <div className="w-full max-w-md aspect-[3/4] rounded-t-[140px] sm:rounded-t-[200px] rounded-b-[36px] overflow-hidden border border-[#C5A880]/40 relative shadow-2xl bg-gradient-to-b from-[#181B20] via-[#121417] to-[#0B0C0E] p-8 flex flex-col items-center justify-between text-center group">
-                
-                {/* Background decorative subtle grid */}
-                <div className="absolute inset-0 bg-[radial-gradient(#C5A880_1px,transparent_1px)] [background-size:24px_24px] opacity-10 pointer-events-none" />
-
-                {/* Ambient glow */}
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#C5A880]/15 via-transparent to-transparent pointer-events-none" />
-
-                {/* If verified photo exists, render it; otherwise, render the clean placeholder */}
-                {FOUNDER_PHOTO ? (
-                  <img
-                    src={FOUNDER_PHOTO}
-                    alt={`${FOUNDER_INFO.name} — ${FOUNDER_INFO.designation}`}
-                    className="w-full h-full object-cover rounded-t-[120px] rounded-b-[28px]"
-                  />
-                ) : (
-                  <div className="relative z-10 w-full h-full flex flex-col items-center justify-center space-y-6 py-6">
-                    
-                    {/* Founder Monogram Medallion */}
-                    <div className="relative">
-                      <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-[#121417] border-2 border-[#C5A880]/70 flex items-center justify-center shadow-2xl relative">
-                        <span className="font-serif text-3xl sm:text-4xl font-bold text-[#C5A880] tracking-wider">
-                          VK
-                        </span>
-                      </div>
-                      <div className="absolute -inset-2 rounded-full border border-[#C5A880]/20 animate-pulse pointer-events-none" />
-                    </div>
-
-                    <div className="space-y-2">
-                      <h3 className="font-serif text-2xl font-bold text-white tracking-wide">
-                        {FOUNDER_INFO.name}
-                      </h3>
-                      <p className="text-xs tracking-[0.25em] uppercase text-[#C5A880] font-semibold">
-                        {FOUNDER_INFO.designation}
-                      </p>
-                    </div>
-
-                    {/* Placeholder pill */}
-                    <div className="bg-[#0E1013]/90 border border-dashed border-[#C5A880]/50 rounded-2xl px-4 py-3 max-w-xs space-y-1">
-                      <span className="text-[10px] uppercase tracking-wider text-[#C5A880] font-semibold block">
-                        Official Portrait Placeholder
-                      </span>
-                      <p className="text-[11px] text-zinc-400 font-light leading-relaxed">
-                        A clean placeholder is displayed until the verified portrait is provided. No stock photos used.
-                      </p>
-                    </div>
-
-                  </div>
-                )}
-
-                {/* Bottom Frame Accent */}
-                <div className="relative z-10 text-[10px] text-zinc-500 uppercase tracking-widest font-mono">
-                  Vetri Real Estate Leadership
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Right Column: Founder Details */}
-            <motion.div
-              variants={fadeUp}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-50px" }}
-              className="lg:col-span-7 space-y-6"
-            >
-              
-              <div className="space-y-2">
-                <span className="text-xs uppercase tracking-[0.25em] text-[#C5A880] font-semibold block">
-                  Executive Profile
-                </span>
-                <h3 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight">
-                  {FOUNDER_INFO.name}
-                </h3>
-                <div className="inline-flex items-center gap-2 pt-1">
-                  <span className="px-3 py-1 rounded-full bg-[#C5A880]/15 border border-[#C5A880]/30 text-[#C5A880] text-xs font-semibold uppercase tracking-wider">
-                    {FOUNDER_INFO.designation}
-                  </span>
-                  <span className="text-xs text-zinc-400 font-light">
-                    Vetri Real Estate
-                  </span>
-                </div>
-              </div>
-
-              {/* Biography Block with Editable Placeholder */}
-              <div className="bg-[#181B20] p-6 rounded-[28px] border border-stone-800 space-y-3">
-                <div className="flex items-center justify-between">
-                  <h4 className="font-serif font-bold text-white text-base flex items-center gap-2">
-                    <User className="w-4 h-4 text-[#C5A880]" />
-                    Biography & Background
-                  </h4>
-                  <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-[#C5A880]/15 text-[#C5A880] border border-[#C5A880]/30 font-medium">
-                    Editable Placeholder
-                  </span>
-                </div>
-
-                <div className="p-4 rounded-xl bg-[#121417] border border-dashed border-[#C5A880]/50">
-                  <p className="font-mono text-xs sm:text-sm text-stone-300 italic leading-relaxed">
-                    {FOUNDER_INFO.biographyPlaceholder}
-                  </p>
-                </div>
-
-                <p className="text-xs text-zinc-400 font-light leading-relaxed">
-                  The founder's verified biography, background, and career history will be displayed here once official documentation is provided. No unverified claims or dates have been fabricated.
-                </p>
-              </div>
-
-              {/* Founder's Vision Statement / Optional Personal Message */}
-              <div className="bg-[#181B20] p-6 rounded-[28px] border border-stone-800 space-y-3">
-                <div className="flex items-center justify-between">
-                  <h4 className="font-serif font-bold text-white text-base flex items-center gap-2">
-                    <Quote className="w-4 h-4 text-[#C5A880]" />
-                    Founder's Vision Statement
-                  </h4>
-                  <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-[#C5A880]/15 text-[#C5A880] border border-[#C5A880]/30 font-medium">
-                    Editable Placeholder
-                  </span>
-                </div>
-
-                <div className="p-4 rounded-xl bg-[#121417] border border-dashed border-[#C5A880]/50 space-y-2">
-                  <p className="font-mono text-xs sm:text-sm text-stone-300 italic leading-relaxed pl-2 border-l-2 border-[#C5A880]">
-                    "{FOUNDER_INFO.visionStatementPlaceholder}"
-                  </p>
-                  <p className="text-right text-[11px] text-[#C5A880] font-medium">
-                    — {FOUNDER_INFO.name}, {FOUNDER_INFO.designation}
-                  </p>
-                </div>
-
-                <p className="text-xs text-zinc-400 font-light leading-relaxed">
-                  A personal leadership message or company vision statement can be placed here to articulate the founder's ethos to prospective property buyers.
-                </p>
-              </div>
-
-              {/* Leadership Guiding Principles */}
-              <div className="pt-2 flex flex-wrap gap-2 sm:gap-3 text-xs">
-                <span className="px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 text-stone-300 flex items-center gap-1.5">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#C5A880]" />
-                  Structural Integrity
-                </span>
-                <span className="px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 text-stone-300 flex items-center gap-1.5">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#C5A880]" />
-                  Transparent Dealings
-                </span>
-                <span className="px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 text-stone-300 flex items-center gap-1.5">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#C5A880]" />
-                  Customer Satisfaction
-                </span>
-              </div>
-
-            </motion.div>
-
-          </div>
-
-        </div>
-      </section>
 
       {/* 5. OUR VALUES SECTION */}
       <section className="py-20 sm:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+
         {/* Section Header */}
         <motion.div
           variants={fadeUp}
@@ -595,7 +521,7 @@ export default function About() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
         <div className="bg-[#0E1013] text-white rounded-[36px] sm:rounded-[48px] p-8 sm:p-12 lg:p-16 border border-[#C5A880]/30 shadow-2xl relative overflow-hidden text-center space-y-6">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#C5A880]/15 via-transparent to-transparent pointer-events-none" />
-          
+
           <div className="relative z-10 max-w-2xl mx-auto space-y-4">
             <span className="text-xs uppercase tracking-widest text-[#C5A880] font-semibold block">
               Work With Us
